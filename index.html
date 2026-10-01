@@ -16,30 +16,57 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#eef4fa}
   const hub=document.getElementById('hub');
 
   function decodeHtml(s){
-    const t=document.createElement('textarea');
-    t.innerHTML=s;
-    return t.value;
-  }
-
-  function looksLikeFullHtml(s){
-    if(!s) return false;
-    const v=decodeHtml(String(s)).trim();
-    return /^(?:```(?:html)?\s*)?(?:<!doctype\s+html|<html[\s>]|<head[\s>]|<body[\s>])/i.test(v) &&
-           /<\/(?:html|body)>/i.test(v);
-  }
-
-  function cleanCodeFence(s){
-    let v=decodeHtml(String(s)).trim();
-    v=v.replace(/^```(?:html)?\s*/i,'').replace(/\s*```$/,'').trim();
+    let v=String(s == null ? '' : s);
+    for(let i=0;i<4;i++){
+      const t=document.createElement('textarea');
+      t.innerHTML=v;
+      const next=t.value;
+      if(next===v) break;
+      v=next;
+    }
     return v;
   }
 
-  function renderRawHtmlElement(el){
-    if(!el || el.dataset && el.dataset.chrisRendered==='1') return false;
-    const txt=(el.tagName==='TEXTAREA' || el.tagName==='INPUT') ? el.value : el.textContent;
-    if(!looksLikeFullHtml(txt)) return false;
+  function cleanHtml(s){
+    let v=decodeHtml(s).trim();
+    v=v.replace(/^\s*```(?:html|HTML)?\s*/,'')
+       .replace(/\s*```\s*$/,'')
+       .trim();
+    return v;
+  }
 
-    const html=cleanCodeFence(txt);
+  function looksLikeHtml(s){
+    if(!s) return false;
+    const v=cleanHtml(s);
+    if(v.length < 40) return false;
+
+    const hasDocument=/(?:<!doctype\s+html|<html[\s>]|<head[\s>]|<body[\s>])/i.test(v);
+    const tagMatches=v.match(/<(?:div|section|article|main|header|footer|nav|style|script|button|select|option|input|label|table|thead|tbody|tr|td|th|form|canvas|svg|img|h[1-6]|p|span|ul|ol|li|iframe)\b/gi) || [];
+    const closing=/<\/(?:div|section|article|main|header|footer|nav|style|script|button|select|label|table|thead|tbody|tr|td|th|form|h[1-6]|p|span|ul|ol|li|iframe)>/i.test(v);
+
+    return hasDocument || (tagMatches.length >= 2 && (closing || /<style\b|<script\b/i.test(v)));
+  }
+
+  function asDocument(html){
+    if(/(?:<!doctype\s+html|<html[\s>])/i.test(html)) return html;
+    return '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"><style>html,body{margin:0;min-height:100%;background:#fff}body{box-sizing:border-box}</style></head><body>'+html+'</body></html>';
+  }
+
+  function rawText(el){
+    if(!el) return '';
+    if(el.tagName==='TEXTAREA' || el.tagName==='INPUT') return el.value || '';
+    return el.textContent || '';
+  }
+
+  function renderRawHtmlElement(el){
+    if(!el || el.nodeType!==1) return false;
+    if(el.dataset && el.dataset.chrisRendered==='1') return false;
+    if(el.tagName==='IFRAME') return false;
+
+    const txt=rawText(el);
+    if(!looksLikeHtml(txt)) return false;
+
+    const html=cleanHtml(txt);
     const frame=document.createElement('iframe');
     frame.setAttribute('title','Chris Program');
     frame.setAttribute('loading','eager');
@@ -50,7 +77,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#eef4fa}
     frame.style.display='block';
     frame.style.background='#fff';
     frame.style.borderRadius='12px';
-    frame.srcdoc=html;
+    frame.srcdoc=asDocument(html);
 
     if(el.dataset) el.dataset.chrisRendered='1';
     el.replaceWith(frame);
@@ -59,22 +86,34 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#eef4fa}
 
   function sweep(doc){
     if(!doc || !doc.body) return;
-    const selector='pre,code,textarea,.program-content,.program-body,.program-display,.runner,.content,[data-program],[data-html]';
-    doc.querySelectorAll(selector).forEach(renderRawHtmlElement);
 
-    // Fallback for raw HTML placed in ordinary containers.
+    const strong='pre,code,textarea,.program-content,.program-body,.program-display,.program-runner,.runner,.content,[data-program],[data-html]';
+    doc.querySelectorAll(strong).forEach(renderRawHtmlElement);
+
     doc.querySelectorAll('div,section,article,main').forEach(el=>{
-      if(el.children.length>8) return;
-      const txt=el.textContent || '';
-      if(txt.length<150 || txt.length>300000) return;
-      renderRawHtmlElement(el);
+      if(el.querySelector('iframe')) return;
+      if(el.children.length>4) return;
+
+      const txt=rawText(el);
+      if(txt.length<80 || txt.length>500000) return;
+
+      const encoded=/&(?:lt|gt|quot|amp);/i.test(el.innerHTML || '');
+      const visibleTags=/<(?:!doctype|html|head|body|div|style|script|button|select|input|table|section|main)\b/i.test(txt);
+
+      if(encoded || visibleTags) renderRawHtmlElement(el);
     });
   }
 
   function install(){
     let doc;
     try{ doc=hub.contentDocument || hub.contentWindow.document; }catch(e){ return; }
-    sweep(doc);
+
+    const runSweep=()=>{
+      try{sweep(doc);}catch(e){}
+    };
+
+    runSweep();
+    [40,120,300,700,1400].forEach(ms=>setTimeout(runSweep,ms));
 
     const observer=new MutationObserver(muts=>{
       for(const m of muts){
@@ -82,21 +121,30 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#eef4fa}
           m.addedNodes.forEach(n=>{
             if(n.nodeType===1){
               renderRawHtmlElement(n);
-              if(n.querySelectorAll) {
-                n.querySelectorAll('pre,code,textarea,div,section,article,main').forEach(renderRawHtmlElement);
+              if(n.querySelectorAll){
+                n.querySelectorAll('pre,code,textarea,.program-content,.program-body,.program-display,.program-runner,.runner,.content,[data-program],[data-html],div,section,article,main')
+                 .forEach(renderRawHtmlElement);
               }
             }
           });
-        } else if(m.type==='characterData'){
+        }else if(m.type==='characterData'){
           const p=m.target.parentElement;
           if(p) renderRawHtmlElement(p);
         }
       }
     });
+
     observer.observe(doc.documentElement,{subtree:true,childList:true,characterData:true});
 
-    // Catch programs loaded by click handlers/timeouts.
-    setInterval(()=>sweep(doc),1200);
+    doc.addEventListener('click',()=>{
+      [0,40,120,300,700].forEach(ms=>setTimeout(runSweep,ms));
+    },true);
+
+    doc.addEventListener('change',()=>{
+      [0,60,180,500].forEach(ms=>setTimeout(runSweep,ms));
+    },true);
+
+    setInterval(runSweep,1000);
   }
 
   hub.addEventListener('load',install);
