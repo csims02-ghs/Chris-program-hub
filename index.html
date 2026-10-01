@@ -1,200 +1,271 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<title>Chris F. Student Program Hub</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Chris F. — Student Program Hub</title>
 <style>
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#eef4fa}
-#hub{border:0;width:100%;height:100%;display:block;background:#fff}
+:root{--blue:#1677ff;--navy:#17365d;--line:#dbe6f2;--muted:#64748b;--bg:#eef4fa;--danger:#b42318}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--navy)}
+body{overflow:hidden}
+.app{height:100dvh;display:grid;grid-template-columns:310px minmax(0,1fr)}
+aside{background:#fff;border-right:1px solid var(--line);padding:12px;overflow:auto;-webkit-overflow-scrolling:touch}
+h1{font-size:22px;margin:0 0 4px}
+.muted{color:var(--muted);font-size:13px}
+.student{margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:10px;background:#f8fbff;line-height:1.5}
+.pill{display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;background:#eaf3ff;color:#145ea8;font-size:12px;font-weight:900}
+.items{display:grid;gap:6px;padding-bottom:18px}
+.program{min-height:50px;text-align:left;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--navy);padding:8px;display:grid;grid-template-columns:34px minmax(0,1fr);gap:5px;align-items:center;touch-action:manipulation;cursor:pointer}
+.program.active{outline:3px solid var(--blue);background:#f6faff}
+.program span{font-weight:900;color:var(--muted)}
+main{min-width:0;min-height:0;padding:10px;display:flex;flex-direction:column}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+#current{font-weight:900;font-size:19px;margin-right:auto}
+.btn{min-height:44px;padding:9px 12px;border:1px solid #bfd0e2;border-radius:8px;background:#fff;color:#145ea8;font-weight:800;touch-action:manipulation;cursor:pointer}
+.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+#status{width:100%;font-size:12px;color:var(--muted)}
+#status.error{color:var(--danger);font-weight:700}
+iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius:10px;background:#fff}
+.app.program-full{grid-template-columns:minmax(0,1fr)}
+.app.program-full aside{display:none}
+.app.program-full main{padding:0}
+.app.program-full .toolbar{padding:8px 10px;margin:0;background:#fff;border-bottom:1px solid var(--line)}
+.app.program-full iframe{border:0;border-radius:0}
+.loading{padding:18px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--muted);font-weight:700}
+@media(max-width:820px){.app{grid-template-columns:250px minmax(0,1fr)}}
+@media(max-width:680px){body{overflow:auto}.app{height:auto;min-height:100dvh;grid-template-columns:1fr}aside{max-height:36vh;border-right:0;border-bottom:1px solid var(--line)}main{height:64vh;min-height:520px}}
 </style>
 </head>
 <body>
-<iframe id="hub" src="hub-source.html" title="Chris F. Student Program Hub"></iframe>
+<div class="app" id="app">
+  <aside>
+    <h1>Chris F.</h1>
+    <div class="muted">Student Program Hub</div>
+    <div class="student">
+      <b>Adult Support</b><br>
+      <span class="muted">Behaviors: Non-Compliance · Tantrum · Work Avoidance · Out of Area</span><br>
+      <span class="muted" id="count">Loading programs…</span><br>
+      <span class="pill">Staff Scored</span>
+    </div>
+    <div class="items" id="items"><div class="loading">Loading Chris programs…</div></div>
+  </aside>
+
+  <main>
+    <div class="toolbar">
+      <div id="current">Loading program hub…</div>
+      <button class="btn" id="prev" type="button" disabled>Previous Program</button>
+      <button class="btn primary" id="next" type="button" disabled>Next Program</button>
+      <button class="btn" id="full" type="button">Full Screen</button>
+      <div id="status">Reading program library…</div>
+    </div>
+    <iframe id="frame" title="Active Program"></iframe>
+  </main>
+</div>
+
 <script>
 (function(){
-  const hub=document.getElementById('hub');
-  const watchedDocs=new WeakSet();
+  const SOURCE='hub-source.html';
+  const app=document.getElementById('app');
+  const items=document.getElementById('items');
+  const count=document.getElementById('count');
+  const frame=document.getElementById('frame');
+  const current=document.getElementById('current');
+  const prev=document.getElementById('prev');
+  const next=document.getElementById('next');
+  const full=document.getElementById('full');
+  const status=document.getElementById('status');
 
-  function decodeHtml(s){
-    let v=String(s==null?'':s);
-    for(let i=0;i<6;i++){
-      const t=document.createElement('textarea');
-      t.innerHTML=v;
-      const n=t.value;
-      if(n===v) break;
-      v=n;
+  let data=[];
+  let buttons=[];
+  let active=0;
+  let loadToken=0;
+  const remoteCache=new Map();
+
+  function setStatus(message,isError){
+    status.textContent=message;
+    status.classList.toggle('error',!!isError);
+  }
+
+  function decodeEntities(value){
+    const box=document.createElement('textarea');
+    box.innerHTML=String(value||'');
+    return box.value;
+  }
+
+  function decode64(b64){
+    const binary=atob(b64);
+    const bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+
+  function normalizeHtml(value){
+    let text=String(value||'').trim();
+    text=text.replace(/^\s*```(?:html)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
+
+    if(!/<(?:!doctype|html|head|body|div|section|main|style|script)\b/i.test(text) &&
+       /&lt;\/?(?:!doctype|html|head|body|div|section|main|style|script)/i.test(text)){
+      text=decodeEntities(text).trim();
     }
-    return v;
+
+    if(!/<(?:!doctype|html|head|body)\b/i.test(text)){
+      text='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"></head><body>'+text+'</body></html>';
+    }
+    return text;
   }
 
-  function cleanHtml(s){
-    let v=decodeHtml(s).trim();
-    v=v.replace(/^\s*```(?:html)?\s*/i,'')
-       .replace(/\s*```\s*$/,'')
-       .trim();
-    return v;
-  }
+  async function getRemoteHtml(url){
+    if(remoteCache.has(url)) return remoteCache.get(url);
 
-  function htmlScore(s){
-    const v=cleanHtml(s);
-    if(v.length<25) return 0;
-    let score=0;
-    if(/<!doctype\s+html/i.test(v)) score+=10;
-    if(/<html[\s>]/i.test(v)) score+=8;
-    if(/<(?:head|body)[\s>]/i.test(v)) score+=5;
-    if(/<(?:style|script)[\s>]/i.test(v)) score+=5;
-    const tags=v.match(/<\/?[a-z][a-z0-9:-]*(?:\s[^<>]*?)?>/gi)||[];
-    score+=Math.min(tags.length,10);
-    if(/<\/(?:div|section|main|article|table|form|style|script|body|html)>/i.test(v)) score+=3;
-    return score;
-  }
+    const task=(async()=>{
+      const u=new URL(url,location.href);
 
-  function looksLikeHtml(s){
-    return htmlScore(s)>=5;
-  }
+      // Supabase Edge Functions on the shared domain rewrite text/html to text/plain.
+      // Request JSON instead, then render the returned html ourselves with srcdoc.
+      if(u.hostname.endsWith('.supabase.co') && u.pathname.includes('/functions/v1/compass-program-runner')){
+        u.searchParams.set('format','json');
+      }
 
-  function asDocument(html){
-    if(/<!doctype\s+html|<html[\s>]/i.test(html)) return html;
-    return '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"><style>html,body{margin:0;min-height:100%;background:#fff}body{box-sizing:border-box}</style></head><body>'+html+'</body></html>';
-  }
+      const response=await fetch(u.toString(),{
+        method:'GET',
+        mode:'cors',
+        cache:'no-store',
+        headers:{'Accept':'application/json, text/plain;q=0.9, */*;q=0.8'}
+      });
 
-  function textOf(el){
-    if(!el) return '';
-    if(el.tagName==='TEXTAREA'||el.tagName==='INPUT') return el.value||'';
-    return el.textContent||'';
-  }
+      if(!response.ok) throw new Error('Program request failed ('+response.status+')');
 
-  function makeProgramFrame(html){
-    const f=document.createElement('iframe');
-    f.setAttribute('title','Chris Program');
-    f.setAttribute('loading','eager');
-    f.style.width='100%';
-    f.style.minHeight='720px';
-    f.style.height='78vh';
-    f.style.border='0';
-    f.style.display='block';
-    f.style.background='#fff';
-    f.style.borderRadius='12px';
-    f.srcdoc=asDocument(html);
-    f.addEventListener('load',()=>watchFrame(f));
-    return f;
-  }
+      const text=await response.text();
+      let html=text;
 
-  function renderElement(el){
-    if(!el||el.nodeType!==1||el.tagName==='IFRAME') return false;
-    if(el.dataset&&el.dataset.chrisRendered==='1') return false;
-
-    const txt=textOf(el);
-    if(!looksLikeHtml(txt)) return false;
-
-    if(el.dataset) el.dataset.chrisRendered='1';
-    const f=makeProgramFrame(cleanHtml(txt));
-    try{ el.replaceWith(f); }catch(e){ return false; }
-    return true;
-  }
-
-  function repairWholeDocument(doc){
-    if(!doc||!doc.body) return false;
-    const b=doc.body;
-    const txt=textOf(b).trim();
-
-    // A nested program sometimes opens as a page containing only literal HTML source.
-    // Only rewrite the whole document when the body itself is essentially just that code.
-    const codeNode=b.querySelector('pre,code,textarea');
-    const codeTxt=codeNode ? textOf(codeNode).trim() : '';
-    const codeDominates=codeTxt && txt && codeTxt.length >= Math.max(40, Math.floor(txt.length*0.80));
-    const simpleBody=b.children.length<=4;
-
-    if(simpleBody && htmlScore(txt)>=8 && (!codeNode || codeDominates)){
-      const html=cleanHtml(codeDominates ? codeTxt : txt);
       try{
-        doc.open();
-        doc.write(asDocument(html));
-        doc.close();
-        setTimeout(()=>watchDocument(doc),0);
-        return true;
-      }catch(e){}
+        const obj=JSON.parse(text);
+        if(obj && typeof obj.html==='string') html=obj.html;
+        else if(obj && obj.ok===false) throw new Error(obj.error||'Program unavailable');
+      }catch(err){
+        if(/^\s*[{[]/.test(text) && !/<(?:!doctype|html|body|div|style|script)\b/i.test(text)) throw err;
+      }
+
+      return normalizeHtml(html);
+    })();
+
+    remoteCache.set(url,task);
+    try{
+      return await task;
+    }catch(err){
+      remoteCache.delete(url);
+      throw err;
     }
-    return false;
   }
 
-  function sweep(doc){
-    if(!doc||!doc.body) return;
+  async function programHtml(program){
+    if(program.mode==='embedded' && program.b64){
+      return normalizeHtml(decode64(program.b64));
+    }
+    if(program.url){
+      return getRemoteHtml(program.url);
+    }
+    throw new Error('Program source is not available in this hub build.');
+  }
 
-    if(repairWholeDocument(doc)) return;
+  function buildButtons(){
+    items.innerHTML='';
+    data.forEach((p,i)=>{
+      const b=document.createElement('button');
+      b.className='program';
+      b.type='button';
+      b.dataset.i=String(i);
 
-    const strong='pre,code,textarea,[contenteditable="true"],.program-content,.program-body,.program-display,.program-runner,.runner,.content,.html-content,.code-content,[data-program],[data-html]';
-    doc.querySelectorAll(strong).forEach(renderElement);
+      const n=document.createElement('span');
+      n.textContent=String(i+1).padStart(2,'0');
+      const label=document.createElement('b');
+      label.textContent=p.name||('Program '+(i+1));
 
-    doc.querySelectorAll('div,section,article,main').forEach(el=>{
-      if(el.querySelector('iframe')) return;
-      if(el.children.length>6) return;
-      const txt=textOf(el);
-      if(txt.length<40||txt.length>1000000) return;
-
-      const inner=el.innerHTML||'';
-      const encoded=/&(?:lt|gt|quot|#60|#62|amp);/i.test(inner);
-      const literal=/<\/?[a-z][a-z0-9:-]*(?:\s|>)/i.test(txt);
-      if((encoded||literal) && looksLikeHtml(txt)) renderElement(el);
+      b.append(n,label);
+      b.addEventListener('click',()=>load(i));
+      items.appendChild(b);
     });
-
-    // Programs may themselves be nested frames.
-    doc.querySelectorAll('iframe').forEach(f=>{
-      f.addEventListener('load',()=>watchFrame(f),{once:false});
-      watchFrame(f);
-    });
+    buttons=[...items.querySelectorAll('.program')];
+    count.textContent=data.length+' programs';
+    prev.disabled=false;
+    next.disabled=false;
   }
 
-  function watchFrame(frame){
-    let d;
-    try{ d=frame.contentDocument || (frame.contentWindow&&frame.contentWindow.document); }catch(e){ return; }
-    if(d) watchDocument(d);
-  }
+  async function load(i){
+    if(!data.length) return;
 
-  function watchDocument(doc){
-    if(!doc||!doc.documentElement) return;
+    i=Math.max(0,Math.min(i,data.length-1));
+    active=i;
+    const token=++loadToken;
+    const p=data[i];
 
-    const run=()=>{ try{sweep(doc);}catch(e){} };
+    buttons.forEach((b,j)=>b.classList.toggle('active',j===i));
+    current.textContent=p.name||('Program '+(i+1));
+    setStatus('Loading · '+(i+1)+' of '+data.length,false);
 
-    if(!watchedDocs.has(doc)){
-      watchedDocs.add(doc);
+    frame.removeAttribute('src');
+    frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:32px;color:#64748b"><b>Loading '+String(p.name||'program').replace(/[<&]/g,'')+'…</b></body></html>';
 
-      const observer=new MutationObserver(muts=>{
-        for(const m of muts){
-          if(m.type==='childList'){
-            m.addedNodes.forEach(n=>{
-              if(n.nodeType!==1) return;
-              if(n.tagName==='IFRAME') watchFrame(n);
-              renderElement(n);
-              if(n.querySelectorAll){
-                n.querySelectorAll('iframe').forEach(watchFrame);
-                n.querySelectorAll('pre,code,textarea,[contenteditable="true"],.program-content,.program-body,.program-display,.program-runner,.runner,.content,.html-content,.code-content,[data-program],[data-html],div,section,article,main')
-                  .forEach(renderElement);
-              }
-            });
-          }else if(m.type==='characterData'){
-            const p=m.target.parentElement;
-            if(p) renderElement(p);
-          }
-        }
-        setTimeout(run,0);
-      });
-
-      observer.observe(doc.documentElement,{subtree:true,childList:true,characterData:true});
-
-      ['click','change','input'].forEach(evt=>{
-        doc.addEventListener(evt,()=>{
-          [0,30,100,250,600,1200].forEach(ms=>setTimeout(run,ms));
-        },true);
-      });
+    try{
+      const html=await programHtml(p);
+      if(token!==loadToken) return;
+      frame.srcdoc=html;
+      setStatus((p.mode==='embedded'?'Loaded locally':'Loaded program')+' · '+(i+1)+' of '+data.length,false);
+    }catch(err){
+      if(token!==loadToken) return;
+      const msg=(err&&err.message)?err.message:String(err);
+      frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:32px"><h2 style="color:#17365d">'+String(p.name||'Program').replace(/[<&]/g,'')+'</h2><p style="color:#b42318;font-weight:700">Unable to load this program.</p><p style="color:#64748b">'+msg.replace(/[<&]/g,'')+'</p></body></html>';
+      setStatus('Load error · '+msg,true);
     }
 
-    run();
-    [50,150,350,800,1600,3000].forEach(ms=>setTimeout(run,ms));
+    try{localStorage.setItem('chris_f_hub:last',String(i));}catch(e){}
+    if(buttons[i]) buttons[i].scrollIntoView({block:'nearest'});
   }
 
-  hub.addEventListener('load',()=>watchFrame(hub));
+  async function start(){
+    try{
+      const response=await fetch(SOURCE+'?v=reviewed-20261001',{cache:'no-store'});
+      if(!response.ok) throw new Error('Could not read '+SOURCE+' ('+response.status+')');
+      const source=await response.text();
+
+      const match=source.match(/<script\s+id=["']programData["'][^>]*>([\s\S]*?)<\/script>/i);
+      if(!match) throw new Error('Program data was not found.');
+
+      let payload=match[1].trim();
+
+      // Older Chris source escaped the JSON as HTML entities.
+      if(/&quot;|&#34;|&amp;/.test(payload.slice(0,1000))) payload=decodeEntities(payload);
+
+      data=JSON.parse(payload);
+      if(!Array.isArray(data)||!data.length) throw new Error('Program list is empty.');
+
+      buildButtons();
+
+      let saved=0;
+      try{saved=Number(localStorage.getItem('chris_f_hub:last')||0);}catch(e){}
+      if(!Number.isFinite(saved)||saved<0||saved>=data.length) saved=0;
+      load(saved);
+    }catch(err){
+      const msg=(err&&err.message)?err.message:String(err);
+      current.textContent='Chris F. Program Hub';
+      items.innerHTML='<div class="loading" style="color:#b42318">Program hub could not be loaded.</div>';
+      setStatus(msg,true);
+      frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:40px"><h2>Chris F. Program Hub</h2><p style="color:#b42318;font-weight:700">'+msg.replace(/[<&]/g,'')+'</p></body></html>';
+    }
+  }
+
+  prev.addEventListener('click',()=>load(active-1));
+  next.addEventListener('click',()=>load(active+1));
+  full.addEventListener('click',()=>{
+    const on=app.classList.toggle('program-full');
+    full.textContent=on?'Show Programs List':'Full Screen';
+    full.setAttribute('aria-pressed',String(on));
+  });
+
+  start();
 })();
 </script>
 </body>
