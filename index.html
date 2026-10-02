@@ -3,10 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">\n<meta name="mobile-web-app-capable" content="yes">\n<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">\n<meta name="apple-mobile-web-app-title" content="Chris Programs">\n<meta name="theme-color" content="#eef4fa">\n<link rel="manifest" href="manifest.webmanifest">\n<title>Chris F. — Student Program Hub</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chris Programs">
+<meta name="theme-color" content="#eef4fa">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Chris F. — Student Program Hub</title>
 <style>
 :root{--blue:#1677ff;--navy:#17365d;--line:#dbe6f2;--muted:#64748b;--bg:#eef4fa;--danger:#b42318}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}\nhtml,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--navy);overscroll-behavior:none;-webkit-text-size-adjust:100%}\nbody{overflow:hidden;padding-top:env(safe-area-inset-top);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);touch-action:manipulation}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--navy);overscroll-behavior:none;-webkit-text-size-adjust:100%}
+body{overflow:hidden;padding-top:env(safe-area-inset-top);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);touch-action:manipulation}
 .app{height:100dvh;display:grid;grid-template-columns:310px minmax(0,1fr)}
 aside{background:#fff;border-right:1px solid var(--line);padding:12px;overflow:auto;-webkit-overflow-scrolling:touch}
 h1{font-size:22px;margin:0 0 4px}
@@ -32,7 +40,8 @@ iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius
 .app.program-full .toolbar{padding:8px 10px;margin:0;background:#fff;border-bottom:1px solid var(--line)}
 .app.program-full iframe{border:0;border-radius:0}
 .loading{padding:18px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--muted);font-weight:700}
-@media(max-width:900px){.app{grid-template-columns:220px minmax(0,1fr)}aside{padding:8px}.program{min-height:48px}.btn{min-height:48px}main{padding:7px}.toolbar{gap:6px;margin-bottom:6px}#current{font-size:17px}}\n@media(max-width:680px){body{overflow:auto}.app{height:auto;min-height:100dvh;grid-template-columns:1fr}aside{max-height:36vh;border-right:0;border-bottom:1px solid var(--line)}main{height:64vh;min-height:520px}}
+@media(max-width:900px){.app{grid-template-columns:220px minmax(0,1fr)}aside{padding:8px}.program{min-height:48px}.btn{min-height:48px}main{padding:7px}.toolbar{gap:6px;margin-bottom:6px}#current{font-size:17px}}
+@media(max-width:680px){body{overflow:auto}.app{height:auto;min-height:100dvh;grid-template-columns:1fr}aside{max-height:36vh;border-right:0;border-bottom:1px solid var(--line)}main{height:64vh;min-height:520px}}
 </style>
 </head>
 <body>
@@ -196,7 +205,17 @@ iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius
     i=Math.max(0,Math.min(i,data.length-1));
     active=i;
     const token=++loadToken;
-    const p=data[i];\n\n    const standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;\n    const ipad=/iPad/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);\n    if(standalone&&ipad&&String(p.name||'').toLowerCase()==='subtraction'){\n      app.classList.add('program-full');\n      full.textContent='Show Programs List';\n      full.setAttribute('aria-pressed','true');\n    }\n\n    buttons.forEach((b,j)=>b.classList.toggle('active',j===i));
+    const p=data[i];
+
+    const standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+    const ipad=/iPad/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+    if(standalone&&ipad&&String(p.name||'').toLowerCase()==='subtraction'){
+      app.classList.add('program-full');
+      full.textContent='Show Programs List';
+      full.setAttribute('aria-pressed','true');
+    }
+
+    buttons.forEach((b,j)=>b.classList.toggle('active',j===i));
     current.textContent=p.name||('Program '+(i+1));
     setStatus('Loading · '+(i+1)+' of '+data.length,false);
 
