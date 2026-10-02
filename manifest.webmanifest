@@ -1,0 +1,10 @@
+{
+  "name": "Chris F. Student Program Hub",
+  "short_name": "Chris Programs",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eef4fa",
+  "theme_color": "#eef4fa"
+}
