@@ -15,14 +15,14 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--navy);overscroll-behavior:none;-webkit-text-size-adjust:100%}
 body{overflow:hidden;padding-top:env(safe-area-inset-top);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);touch-action:manipulation}
-.app{height:100dvh;display:grid;grid-template-columns:310px minmax(0,1fr)}
+.app{height:100dvh;display:grid;grid-template-columns:300px minmax(0,1fr)}
 aside{background:#fff;border-right:1px solid var(--line);padding:12px;overflow:auto;-webkit-overflow-scrolling:touch}
 h1{font-size:22px;margin:0 0 4px}
 .muted{color:var(--muted);font-size:13px}
 .student{margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:10px;background:#f8fbff;line-height:1.5}
 .pill{display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;background:#eaf3ff;color:#145ea8;font-size:12px;font-weight:900}
 .items{display:grid;gap:6px;padding-bottom:18px}
-.program{min-height:50px;text-align:left;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--navy);padding:8px;display:grid;grid-template-columns:34px minmax(0,1fr);gap:5px;align-items:center;touch-action:manipulation;cursor:pointer}
+.program{min-height:52px;width:100%;text-align:left;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--navy);padding:8px;display:grid;grid-template-columns:34px minmax(0,1fr);gap:5px;align-items:center;touch-action:manipulation;cursor:pointer}
 .program.active{outline:3px solid var(--blue);background:#f6faff}
 .program span{font-weight:900;color:var(--muted)}
 main{min-width:0;min-height:0;padding:10px;display:flex;flex-direction:column}
@@ -39,8 +39,8 @@ iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius
 .app.program-full main{padding:0}
 .app.program-full .toolbar{padding:8px 10px;margin:0;background:#fff;border-bottom:1px solid var(--line)}
 .app.program-full iframe{border:0;border-radius:0}
-.loading{padding:18px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--muted);font-weight:700}
-@media(max-width:900px){.app{grid-template-columns:220px minmax(0,1fr)}aside{padding:8px}.program{min-height:48px}.btn{min-height:48px}main{padding:7px}.toolbar{gap:6px;margin-bottom:6px}#current{font-size:17px}}
+.loading{padding:18px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--muted);font-weight:700}.support-label{display:block;font-size:12px;font-weight:900;color:#49657f;margin-bottom:8px}.support-label input{width:100%;min-height:44px;margin-top:5px;padding:8px 10px;border:1px solid #bfd0e2;border-radius:8px;font-size:16px;color:var(--navy);background:#fff}.ipad-badge{display:inline-block;margin-top:7px;padding:4px 8px;border-radius:999px;background:#eaf3ff;color:#145ea8;font-size:12px;font-weight:900}
+@media(min-width:701px) and (max-width:1100px){.app{grid-template-columns:250px minmax(0,1fr)}aside{padding:9px}.program{min-height:52px}.program b{font-size:13px}.btn{min-height:48px;padding:9px 11px}main{padding:8px}.toolbar{gap:6px;margin-bottom:6px}#current{font-size:17px}.student{padding:9px}.items{gap:6px}}
 @media(max-width:680px){body{overflow:auto}.app{height:auto;min-height:100dvh;grid-template-columns:1fr}aside{max-height:36vh;border-right:0;border-bottom:1px solid var(--line)}main{height:64vh;min-height:520px}}
 </style>
 </head>
@@ -50,10 +50,10 @@ iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius
     <h1>Chris F.</h1>
     <div class="muted">Student Program Hub</div>
     <div class="student">
-      <b>Adult Support</b><br>
+      <label class="support-label">Adult Support<input id="adultSupport" autocomplete="off" placeholder="Enter name"></label>
       <span class="muted">Behaviors: Non-Compliance · Tantrum · Work Avoidance · Out of Area</span><br>
       <span class="muted" id="count">Loading programs…</span><br>
-      <span class="pill">Staff Scored</span>
+      <span class="pill">Staff Scored</span> <span class="ipad-badge">iPad 7 Ready</span>
     </div>
     <div class="items" id="items"><div class="loading">Loading Chris programs…</div></div>
   </aside>
@@ -63,7 +63,7 @@ iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius
       <div id="current">Loading program hub…</div>
       <button class="btn" id="prev" type="button" disabled>Previous Program</button>
       <button class="btn primary" id="next" type="button" disabled>Next Program</button>
-      <button class="btn" id="full" type="button">Full Screen</button>
+      <button class="btn" id="full" type="button">Open Full Screen</button>
       <div id="status">Reading program library…</div>
     </div>
     <iframe id="frame" title="Active Program"></iframe>
@@ -82,6 +82,7 @@ iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius
   const next=document.getElementById('next');
   const full=document.getElementById('full');
   const status=document.getElementById('status');
+  const adultSupport=document.getElementById('adultSupport');
 
   let data=[];
   let buttons=[];
@@ -107,6 +108,8 @@ iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius
     return new TextDecoder('utf-8').decode(bytes);
   }
 
+  const IPAD_STYLE="\n<style id=\"compass-chris-ipad7-v2\">\nhtml{-webkit-text-size-adjust:100%;text-size-adjust:100%}\nbody{overscroll-behavior:none}\nbutton,select,input,textarea{-webkit-tap-highlight-color:transparent;touch-action:manipulation}\nbutton{-webkit-user-select:none;user-select:none}\nselect,input,textarea{font-size:16px}\n.choice,.action,.btn,.endbtn,.setup-toggle,.apply,.save,.minus,.plus{min-height:44px}\n.choice{touch-action:manipulation}\n.stimulus-frame{background:#fff}\n.stimulus-card img{-webkit-user-drag:none;user-select:none}\n.program-setup{padding:24px 24px 16px}\n.setup-header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}\n.setup-title{font-size:28px;line-height:1.18;font-weight:800}\n.setup-subtitle{font-size:16px;line-height:1.25;margin-top:4px}\n.setup-toggle{width:54px;height:54px;min-width:54px;border-radius:12px;font-size:19px}\n.setup-body{margin-top:28px}\n.setup-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));column-gap:18px;row-gap:20px;align-items:end}\n.setup-field{min-width:0}\n.setup-field label{display:block;font-size:17px;font-weight:800;line-height:1.24;margin-bottom:8px}\n.setup-field select,.setup-field input{width:100%;min-width:0;height:60px;min-height:60px;padding:10px 16px;border-radius:12px;font-size:21px;line-height:1.2}\n.setup-field select{text-overflow:ellipsis}\n.toggle-wrap{display:flex;align-items:center;gap:18px;min-height:70px;padding:10px 16px;border-radius:12px;font-size:19px;line-height:1.1}\n.toggle-wrap input{width:20px;height:20px;flex:0 0 20px}\n.apply,.save{min-height:60px;padding:12px 22px;border-radius:12px;font-size:20px;line-height:1.15}\n.preview{margin-top:12px;padding:10px 14px;border-radius:10px;line-height:1.3}\n.mastery-field .percent{max-width:150px}\n.mastery-field input{padding-right:40px}\n.matching-option{min-height:150px;touch-action:manipulation}\n@media (min-width:701px) and (max-width:1100px){\n  .main{padding:10px}\n  .topbar,.student-card,.program-card,.sessionbar{margin-bottom:8px}\n  .program-setup{padding:18px 20px 14px}\n  .setup-title{font-size:23px}\n  .setup-subtitle{font-size:14px}\n  .setup-body{margin-top:18px}\n  .setup-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 18px}\n  .setup-field label{font-size:16px;margin-bottom:7px}\n  .setup-field select,.setup-field input{height:54px;min-height:54px;padding:10px 13px;font-size:18px}\n  .toggle-wrap{min-height:54px;font-size:17px;gap:10px;padding:8px 12px}\n  .setup-actions{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}\n  .apply,.save{min-height:54px;padding:10px 12px;font-size:18px}\n  .instruction{font-size:32px}\n  .response-row{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}\n  .action{min-height:54px;padding:10px 8px}\n  .choice{min-height:135px}\n  .behaviorbar{gap:8px;padding:10px}\n  .behavior{min-height:48px}\n}\n@media (orientation:landscape) and (min-width:701px) and (max-width:1100px){\n  .main{padding:8px 10px}\n  .instruction{margin-top:8px;margin-bottom:10px}\n  .choice,.matching-option{min-height:135px}\n}\n@media(max-width:700px){\n  .program-setup{padding:14px 16px}\n  .setup-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}\n  .setup-actions{grid-column:1/-1}\n  .setup-body{margin-top:14px}\n}\n@media(max-width:440px){\n  .setup-grid{grid-template-columns:1fr}\n  .setup-actions{display:flex;flex-direction:column}\n  .setup-actions .apply,.setup-actions .save{width:100%}\n}\n</style>";
+
   function normalizeHtml(value){
     let text=String(value||'').trim();
     text=text.replace(/^\s*```(?:html)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
@@ -118,6 +121,17 @@ iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius
 
     if(!/<(?:!doctype|html|head|body)\b/i.test(text)){
       text='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"></head><body>'+text+'</body></html>';
+    }
+
+    if(/<meta\s+name=["']viewport["'][^>]*>/i.test(text)){
+      text=text.replace(/<meta\s+name=["']viewport["'][^>]*>/i,'<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">');
+    }else if(/<head[^>]*>/i.test(text)){
+      text=text.replace(/<head([^>]*)>/i,'<head$1><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">');
+    }
+
+    if(!/id=["']compass-chris-ipad7-v2["']/i.test(text)){
+      if(/<\/head>/i.test(text)) text=text.replace(/<\/head>/i,IPAD_STYLE+'</head>');
+      else text=IPAD_STYLE+text;
     }
     return text;
   }
@@ -207,14 +221,6 @@ iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius
     const token=++loadToken;
     const p=data[i];
 
-    const standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
-    const ipad=/iPad/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-    if(standalone&&ipad&&String(p.name||'').toLowerCase()==='subtraction'){
-      app.classList.add('program-full');
-      full.textContent='Show Programs List';
-      full.setAttribute('aria-pressed','true');
-    }
-
     buttons.forEach((b,j)=>b.classList.toggle('active',j===i));
     current.textContent=p.name||('Program '+(i+1));
     setStatus('Loading · '+(i+1)+' of '+data.length,false);
@@ -270,11 +276,29 @@ iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius
     }
   }
 
+  function syncStudentContext(){
+    try{
+      const doc=frame.contentDocument;
+      if(!doc) return;
+      const name=doc.getElementById('studentName');
+      if(name) name.textContent='Chris F.';
+      const provider=doc.getElementById('providerName');
+      if(provider) provider.textContent=(adultSupport.value||'Adult Support').trim()||'Adult Support';
+    }catch(e){}
+  }
+
+  try{adultSupport.value=localStorage.getItem('chris_f_hub:adult_support')||'';}catch(e){}
+  adultSupport.addEventListener('input',()=>{
+    try{localStorage.setItem('chris_f_hub:adult_support',adultSupport.value.trim());}catch(e){}
+    syncStudentContext();
+  });
+  frame.addEventListener('load',syncStudentContext);
+
   prev.addEventListener('click',()=>load(active-1));
   next.addEventListener('click',()=>load(active+1));
   full.addEventListener('click',()=>{
     const on=app.classList.toggle('program-full');
-    full.textContent=on?'Show Programs List':'Full Screen';
+    full.textContent=on?'Show Programs List':'Open Full Screen';
     full.setAttribute('aria-pressed',String(on));
   });
 
