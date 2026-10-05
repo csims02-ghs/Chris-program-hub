@@ -17,29 +17,17 @@ html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background
 body{overflow:hidden;padding-top:env(safe-area-inset-top);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);touch-action:manipulation}
 .app{height:100dvh;display:grid;grid-template-columns:300px minmax(0,1fr)}
 aside{background:#fff;border-right:1px solid var(--line);padding:12px;overflow:auto;-webkit-overflow-scrolling:touch}
-h1{font-size:22px;margin:0 0 4px}
-.muted{color:var(--muted);font-size:13px}
+h1{font-size:22px;margin:0 0 4px}.muted{color:var(--muted);font-size:13px}
 .student{margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:10px;background:#f8fbff;line-height:1.5}
-.pill{display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;background:#eaf3ff;color:#145ea8;font-size:12px;font-weight:900}
+.pill,.ipad-badge{display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;background:#eaf3ff;color:#145ea8;font-size:12px;font-weight:900}
 .items{display:grid;gap:6px;padding-bottom:18px}
 .program{min-height:52px;width:100%;text-align:left;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--navy);padding:8px;display:grid;grid-template-columns:34px minmax(0,1fr);gap:5px;align-items:center;touch-action:manipulation;cursor:pointer}
-.program.active{outline:3px solid var(--blue);background:#f6faff}
-.program span{font-weight:900;color:var(--muted)}
-main{min-width:0;min-height:0;padding:10px;display:flex;flex-direction:column}
-.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
-#current{font-weight:900;font-size:19px;margin-right:auto}
-.btn{min-height:44px;padding:9px 12px;border:1px solid #bfd0e2;border-radius:8px;background:#fff;color:#145ea8;font-weight:800;touch-action:manipulation;cursor:pointer}
-.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-#status{width:100%;font-size:12px;color:var(--muted)}
-#status.error{color:var(--danger);font-weight:700}
-iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius:10px;background:#fff}
-.app.program-full{grid-template-columns:minmax(0,1fr)}
-.app.program-full aside{display:none}
-.app.program-full main{padding:0}
-.app.program-full .toolbar{padding:8px 10px;margin:0;background:#fff;border-bottom:1px solid var(--line)}
-.app.program-full iframe{border:0;border-radius:0}
-.loading{padding:18px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--muted);font-weight:700}.support-label{display:block;font-size:12px;font-weight:900;color:#49657f;margin-bottom:8px}.support-label input{width:100%;min-height:44px;margin-top:5px;padding:8px 10px;border:1px solid #bfd0e2;border-radius:8px;font-size:16px;color:var(--navy);background:#fff}.ipad-badge{display:inline-block;margin-top:7px;padding:4px 8px;border-radius:999px;background:#eaf3ff;color:#145ea8;font-size:12px;font-weight:900}
+.program.active{outline:3px solid var(--blue);background:#f6faff}.program span{font-weight:900;color:var(--muted)}
+main{min-width:0;min-height:0;padding:10px;display:flex;flex-direction:column}.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+#current{font-weight:900;font-size:19px;margin-right:auto}.btn{min-height:44px;padding:9px 12px;border:1px solid #bfd0e2;border-radius:8px;background:#fff;color:#145ea8;font-weight:800;touch-action:manipulation;cursor:pointer}.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}.btn:disabled{opacity:.45;cursor:not-allowed}
+#status{width:100%;font-size:12px;color:var(--muted)}#status.error{color:var(--danger);font-weight:700}
+iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius:10px;background:#fff}.app.program-full{grid-template-columns:minmax(0,1fr)}.app.program-full aside{display:none}.app.program-full main{padding:0}.app.program-full .toolbar{padding:8px 10px;margin:0;background:#fff;border-bottom:1px solid var(--line)}.app.program-full iframe{border:0;border-radius:0}
+.loading{padding:18px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--muted);font-weight:700}.support-label{display:block;font-size:12px;font-weight:900;color:#49657f;margin-bottom:8px}.support-label input{width:100%;min-height:44px;margin-top:5px;padding:8px 10px;border:1px solid #bfd0e2;border-radius:8px;font-size:16px;color:var(--navy);background:#fff}
 @media(min-width:701px) and (max-width:1100px){.app{grid-template-columns:250px minmax(0,1fr)}aside{padding:9px}.program{min-height:52px}.program b{font-size:13px}.btn{min-height:48px;padding:9px 11px}main{padding:8px}.toolbar{gap:6px;margin-bottom:6px}#current{font-size:17px}.student{padding:9px}.items{gap:6px}}
 @media(max-width:680px){body{overflow:auto}.app{height:auto;min-height:100dvh;grid-template-columns:1fr}aside{max-height:36vh;border-right:0;border-bottom:1px solid var(--line)}main{height:64vh;min-height:520px}}
 </style>
@@ -51,13 +39,12 @@ iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius
     <div class="muted">Student Program Hub</div>
     <div class="student">
       <label class="support-label">Adult Support<input id="adultSupport" autocomplete="off" placeholder="Enter name"></label>
-      <span class="muted">Behaviors: Non-Compliance · Tantrum · Work Avoidance · Out of Area</span><br>
+      <span class="muted"><b>Behaviors:</b> Non-Compliance · Tantrum · Work Avoidance · Out of Area</span><br>
       <span class="muted" id="count">Loading programs…</span><br>
       <span class="pill">Staff Scored</span> <span class="ipad-badge">iPad 7 Ready</span>
     </div>
     <div class="items" id="items"><div class="loading">Loading Chris programs…</div></div>
   </aside>
-
   <main>
     <div class="toolbar">
       <div id="current">Loading program hub…</div>
@@ -69,240 +56,93 @@ iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius
     <iframe id="frame" title="Active Program"></iframe>
   </main>
 </div>
-
 <script>
 (function(){
   const SOURCE='hub-source.html';
-  const app=document.getElementById('app');
-  const items=document.getElementById('items');
-  const count=document.getElementById('count');
-  const frame=document.getElementById('frame');
-  const current=document.getElementById('current');
-  const prev=document.getElementById('prev');
-  const next=document.getElementById('next');
-  const full=document.getElementById('full');
-  const status=document.getElementById('status');
-  const adultSupport=document.getElementById('adultSupport');
+  const app=document.getElementById('app'),items=document.getElementById('items'),count=document.getElementById('count'),frame=document.getElementById('frame'),current=document.getElementById('current'),prev=document.getElementById('prev'),next=document.getElementById('next'),full=document.getElementById('full'),status=document.getElementById('status'),adultSupport=document.getElementById('adultSupport');
+  let data=[],buttons=[],active=0,loadToken=0; const remoteCache=new Map();
+  function setStatus(message,isError){status.textContent=message;status.classList.toggle('error',!!isError)}
+  function decodeEntities(value){const box=document.createElement('textarea');box.innerHTML=String(value||'');return box.value}
+  function decode64(b64){const binary=atob(b64),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return new TextDecoder('utf-8').decode(bytes)}
 
-  let data=[];
-  let buttons=[];
-  let active=0;
-  let loadToken=0;
-  const remoteCache=new Map();
+  const IPAD_STYLE=`<style id="chris-ipad7-v3">
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}body{overscroll-behavior:none}button,select,input,textarea{-webkit-tap-highlight-color:transparent;touch-action:manipulation}button{-webkit-user-select:none;user-select:none}select,input,textarea{font-size:16px}.choice,.action,.btn,.endbtn,.setup-toggle,.apply,.save,.minus,.plus{min-height:44px}.behavior{min-height:48px}
+@media (min-width:701px) and (max-width:1100px){.main{padding:10px}.topbar,.student-card,.program-card,.sessionbar{margin-bottom:8px}.program-setup{padding:18px 20px 14px}.setup-title{font-size:23px}.setup-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 18px}.setup-field select,.setup-field input{min-height:54px;font-size:18px}.instruction{font-size:32px}.response-row{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.action{min-height:54px}.choice{min-height:135px}.behaviorbar{gap:8px;padding:10px}}
+</style>`;
 
-  function setStatus(message,isError){
-    status.textContent=message;
-    status.classList.toggle('error',!!isError);
-  }
-
-  function decodeEntities(value){
-    const box=document.createElement('textarea');
-    box.innerHTML=String(value||'');
-    return box.value;
-  }
-
-  function decode64(b64){
-    const binary=atob(b64);
-    const bytes=new Uint8Array(binary.length);
-    for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
-    return new TextDecoder('utf-8').decode(bytes);
-  }
-
-  const IPAD_STYLE="\n<style id=\"compass-chris-ipad7-v2\">\nhtml{-webkit-text-size-adjust:100%;text-size-adjust:100%}\nbody{overscroll-behavior:none}\nbutton,select,input,textarea{-webkit-tap-highlight-color:transparent;touch-action:manipulation}\nbutton{-webkit-user-select:none;user-select:none}\nselect,input,textarea{font-size:16px}\n.choice,.action,.btn,.endbtn,.setup-toggle,.apply,.save,.minus,.plus{min-height:44px}\n.choice{touch-action:manipulation}\n.stimulus-frame{background:#fff}\n.stimulus-card img{-webkit-user-drag:none;user-select:none}\n.program-setup{padding:24px 24px 16px}\n.setup-header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}\n.setup-title{font-size:28px;line-height:1.18;font-weight:800}\n.setup-subtitle{font-size:16px;line-height:1.25;margin-top:4px}\n.setup-toggle{width:54px;height:54px;min-width:54px;border-radius:12px;font-size:19px}\n.setup-body{margin-top:28px}\n.setup-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));column-gap:18px;row-gap:20px;align-items:end}\n.setup-field{min-width:0}\n.setup-field label{display:block;font-size:17px;font-weight:800;line-height:1.24;margin-bottom:8px}\n.setup-field select,.setup-field input{width:100%;min-width:0;height:60px;min-height:60px;padding:10px 16px;border-radius:12px;font-size:21px;line-height:1.2}\n.setup-field select{text-overflow:ellipsis}\n.toggle-wrap{display:flex;align-items:center;gap:18px;min-height:70px;padding:10px 16px;border-radius:12px;font-size:19px;line-height:1.1}\n.toggle-wrap input{width:20px;height:20px;flex:0 0 20px}\n.apply,.save{min-height:60px;padding:12px 22px;border-radius:12px;font-size:20px;line-height:1.15}\n.preview{margin-top:12px;padding:10px 14px;border-radius:10px;line-height:1.3}\n.mastery-field .percent{max-width:150px}\n.mastery-field input{padding-right:40px}\n.matching-option{min-height:150px;touch-action:manipulation}\n@media (min-width:701px) and (max-width:1100px){\n  .main{padding:10px}\n  .topbar,.student-card,.program-card,.sessionbar{margin-bottom:8px}\n  .program-setup{padding:18px 20px 14px}\n  .setup-title{font-size:23px}\n  .setup-subtitle{font-size:14px}\n  .setup-body{margin-top:18px}\n  .setup-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 18px}\n  .setup-field label{font-size:16px;margin-bottom:7px}\n  .setup-field select,.setup-field input{height:54px;min-height:54px;padding:10px 13px;font-size:18px}\n  .toggle-wrap{min-height:54px;font-size:17px;gap:10px;padding:8px 12px}\n  .setup-actions{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}\n  .apply,.save{min-height:54px;padding:10px 12px;font-size:18px}\n  .instruction{font-size:32px}\n  .response-row{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}\n  .action{min-height:54px;padding:10px 8px}\n  .choice{min-height:135px}\n  .behaviorbar{gap:8px;padding:10px}\n  .behavior{min-height:48px}\n}\n@media (orientation:landscape) and (min-width:701px) and (max-width:1100px){\n  .main{padding:8px 10px}\n  .instruction{margin-top:8px;margin-bottom:10px}\n  .choice,.matching-option{min-height:135px}\n}\n@media(max-width:700px){\n  .program-setup{padding:14px 16px}\n  .setup-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}\n  .setup-actions{grid-column:1/-1}\n  .setup-body{margin-top:14px}\n}\n@media(max-width:440px){\n  .setup-grid{grid-template-columns:1fr}\n  .setup-actions{display:flex;flex-direction:column}\n  .setup-actions .apply,.setup-actions .save{width:100%}\n}\n</style>";
-
-  function normalizeHtml(value){
-    let text=String(value||'').trim();
-    text=text.replace(/^\s*```(?:html)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
-
-    if(!/<(?:!doctype|html|head|body|div|section|main|style|script)\b/i.test(text) &&
-       /&lt;\/?(?:!doctype|html|head|body|div|section|main|style|script)/i.test(text)){
-      text=decodeEntities(text).trim();
+  function behaviorGuardScript(){return `<script id="chris-behavior-guard">(function(){
+    var allowed=['non-compliance','tantrum','work avoidance','out of area'];
+    function clean(){
+      var nodes=[].slice.call(document.querySelectorAll('button,.behavior,.behavior-item,[data-behavior],.behavior-card'));
+      nodes.forEach(function(el){
+        var t=(el.getAttribute('data-behavior')||el.textContent||'').trim().toLowerCase().replace(/\\s+/g,' ');
+        var looks=t && (el.classList.contains('behavior')||el.classList.contains('behavior-item')||el.classList.contains('behavior-card')||el.hasAttribute('data-behavior')||el.closest('.behaviorbar,.behavior-bar,.behaviors,.behavior-section'));
+        if(!looks)return;
+        var keep=allowed.some(function(a){return t===a||t.indexOf(a)>=0;});
+        if(!keep)el.remove();
+      });
+      document.querySelectorAll('.behaviorbar,.behavior-bar,.behaviors,.behavior-section').forEach(function(bar){
+        var txt=(bar.textContent||'').toLowerCase();
+        if(!txt)return;
+      });
     }
+    clean(); new MutationObserver(clean).observe(document.documentElement,{childList:true,subtree:true});
+  })();<\/script>`}
 
-    if(!/<(?:!doctype|html|head|body)\b/i.test(text)){
-      text='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"></head><body>'+text+'</body></html>';
-    }
+  function letterTracingScript(){return `<style id="chris-letter-tracing-style">
+#chrisLetterControls{position:sticky;bottom:0;z-index:99999;background:#fff;border-top:2px solid #dbe6f2;padding:10px;display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:10px;box-shadow:0 -4px 16px rgba(15,23,42,.08)}
+#chrisLetterControls button{min-height:58px;border-radius:12px;border:2px solid #bfd0e2;background:#fff;font-size:20px;font-weight:900;color:#17365d;touch-action:manipulation}
+#chrisLetterControls button[data-score="correct"].selected{background:#eaf8ef;border-color:#2f855a}#chrisLetterControls button[data-score="incorrect"].selected{background:#fff1f1;border-color:#c53030}#chrisNextTrial{background:#1677ff!important;color:#fff!important;border-color:#1677ff!important}
+</style><script id="chris-letter-tracing-controls">(function(){
+ if(document.getElementById('chrisLetterControls'))return;
+ var bar=document.createElement('div');bar.id='chrisLetterControls';bar.innerHTML='<button type="button" data-score="correct">Correct</button><button type="button" data-score="incorrect">Incorrect</button><button type="button" id="chrisNextTrial">Next Trial</button>';
+ document.body.appendChild(bar);
+ var score='';
+ function mark(v){score=v;bar.querySelectorAll('[data-score]').forEach(function(b){b.classList.toggle('selected',b.getAttribute('data-score')===v)});}
+ bar.querySelector('[data-score="correct"]').onclick=function(){mark('correct')};
+ bar.querySelector('[data-score="incorrect"]').onclick=function(){mark('incorrect')};
+ function clickByText(words){var all=[].slice.call(document.querySelectorAll('button,[role="button"],input[type="button"],input[type="submit"]'));for(var i=0;i<all.length;i++){var e=all[i];if(bar.contains(e))continue;var t=((e.textContent||e.value||'')+'').trim().toLowerCase();if(words.some(function(w){return t===w||t.indexOf(w)>=0;})){try{e.click();return true}catch(x){}}}return false}
+ function erase(){
+   clickByText(['erase','clear','reset drawing','clear tracing','clear canvas']);
+   document.querySelectorAll('canvas').forEach(function(c){try{var ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);c.dispatchEvent(new Event('change',{bubbles:true}))}catch(e){}});
+   document.querySelectorAll('svg .trace-line,svg .user-line,svg path[data-user],svg polyline[data-user]').forEach(function(e){e.remove()});
+ }
+ function nextTrial(){
+   erase();
+   var advanced=clickByText(['next trial','next letter','next target','new trial']);
+   if(!advanced){
+     var selects=[].slice.call(document.querySelectorAll('select'));var target=selects.find(function(s){return /letter|target/i.test((s.name||'')+' '+(s.id||'')+' '+((s.previousElementSibling&&s.previousElementSibling.textContent)||''))});
+     if(target&&target.options.length>1){target.selectedIndex=(target.selectedIndex+1)%target.options.length;target.dispatchEvent(new Event('change',{bubbles:true}));advanced=true;}
+   }
+   score='';bar.querySelectorAll('[data-score]').forEach(function(b){b.classList.remove('selected')});
+ }
+ document.getElementById('chrisNextTrial').onclick=nextTrial;
+})();<\/script>`}
 
-    if(/<meta\s+name=["']viewport["'][^>]*>/i.test(text)){
-      text=text.replace(/<meta\s+name=["']viewport["'][^>]*>/i,'<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">');
-    }else if(/<head[^>]*>/i.test(text)){
-      text=text.replace(/<head([^>]*)>/i,'<head$1><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">');
-    }
-
-    if(!/id=["']compass-chris-ipad7-v2["']/i.test(text)){
-      if(/<\/head>/i.test(text)) text=text.replace(/<\/head>/i,IPAD_STYLE+'</head>');
-      else text=IPAD_STYLE+text;
-    }
+  function normalizeHtml(value,programName){
+    let text=String(value||'').trim().replace(/^\s*```(?:html)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
+    if(!/<(?:!doctype|html|head|body|div|section|main|style|script)\b/i.test(text)&&/&lt;\/?(?:!doctype|html|head|body|div|section|main|style|script)/i.test(text))text=decodeEntities(text).trim();
+    if(!/<(?:!doctype|html|head|body)\b/i.test(text))text='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"></head><body>'+text+'</body></html>';
+    if(/<meta\s+name=["']viewport["'][^>]*>/i.test(text))text=text.replace(/<meta\s+name=["']viewport["'][^>]*>/i,'<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">');
+    else if(/<head[^>]*>/i.test(text))text=text.replace(/<head([^>]*)>/i,'<head$1><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">');
+    if(!/id=["']chris-ipad7-v3["']/i.test(text))text=text.replace(/<\/head>/i,IPAD_STYLE+'</head>');
+    if(!/id=["']chris-behavior-guard["']/i.test(text))text=text.replace(/<\/body>/i,behaviorGuardScript()+'</body>');
+    if(/letter\s*tracing/i.test(String(programName||''))&&!/id=["']chris-letter-tracing-controls["']/i.test(text))text=text.replace(/<\/body>/i,letterTracingScript()+'</body>');
     return text;
   }
 
-  async function getRemoteHtml(url){
-    if(remoteCache.has(url)) return remoteCache.get(url);
+  async function getRemoteHtml(url,programName){
+    const key=url+'|'+programName;if(remoteCache.has(key))return remoteCache.get(key);
+    const task=(async()=>{const u=new URL(url,location.href);if(u.hostname.endsWith('.supabase.co')&&u.pathname.includes('/functions/v1/compass-program-runner'))u.searchParams.set('format','json');const response=await fetch(u.toString(),{method:'GET',mode:'cors',cache:'no-store',headers:{'Accept':'application/json, text/plain;q=0.9, */*;q=0.8'}});if(!response.ok)throw new Error('Program request failed ('+response.status+')');const raw=await response.text();let html=raw;try{const obj=JSON.parse(raw);if(obj&&typeof obj.html==='string')html=obj.html;else if(obj&&obj.ok===false)throw new Error(obj.error||'Program unavailable')}catch(err){if(/^\s*[{[]/.test(raw)&&!/<(?:!doctype|html|body|div|style|script)\b/i.test(raw))throw err}return normalizeHtml(html,programName)})();remoteCache.set(key,task);try{return await task}catch(err){remoteCache.delete(key);throw err}}
+  async function programHtml(program){if(program.mode==='embedded'&&program.b64)return normalizeHtml(decode64(program.b64),program.name);if(program.url)return getRemoteHtml(program.url,program.name);throw new Error('Program source is not available in this hub build.')}
 
-    const task=(async()=>{
-      const u=new URL(url,location.href);
-
-      // Supabase Edge Functions on the shared domain rewrite text/html to text/plain.
-      // Request JSON instead, then render the returned html ourselves with srcdoc.
-      if(u.hostname.endsWith('.supabase.co') && u.pathname.includes('/functions/v1/compass-program-runner')){
-        u.searchParams.set('format','json');
-      }
-
-      const response=await fetch(u.toString(),{
-        method:'GET',
-        mode:'cors',
-        cache:'no-store',
-        headers:{'Accept':'application/json, text/plain;q=0.9, */*;q=0.8'}
-      });
-
-      if(!response.ok) throw new Error('Program request failed ('+response.status+')');
-
-      const text=await response.text();
-      let html=text;
-
-      try{
-        const obj=JSON.parse(text);
-        if(obj && typeof obj.html==='string') html=obj.html;
-        else if(obj && obj.ok===false) throw new Error(obj.error||'Program unavailable');
-      }catch(err){
-        if(/^\s*[{[]/.test(text) && !/<(?:!doctype|html|body|div|style|script)\b/i.test(text)) throw err;
-      }
-
-      return normalizeHtml(html);
-    })();
-
-    remoteCache.set(url,task);
-    try{
-      return await task;
-    }catch(err){
-      remoteCache.delete(url);
-      throw err;
-    }
-  }
-
-  async function programHtml(program){
-    if(program.mode==='embedded' && program.b64){
-      return normalizeHtml(decode64(program.b64));
-    }
-    if(program.url){
-      return getRemoteHtml(program.url);
-    }
-    throw new Error('Program source is not available in this hub build.');
-  }
-
-  function buildButtons(){
-    items.innerHTML='';
-    data.forEach((p,i)=>{
-      const b=document.createElement('button');
-      b.className='program';
-      b.type='button';
-      b.dataset.i=String(i);
-
-      const n=document.createElement('span');
-      n.textContent=String(i+1).padStart(2,'0');
-      const label=document.createElement('b');
-      label.textContent=p.name||('Program '+(i+1));
-
-      b.append(n,label);
-      b.addEventListener('click',()=>load(i));
-      items.appendChild(b);
-    });
-    buttons=[...items.querySelectorAll('.program')];
-    count.textContent=data.length+' programs';
-    prev.disabled=false;
-    next.disabled=false;
-  }
-
-  async function load(i){
-    if(!data.length) return;
-
-    i=Math.max(0,Math.min(i,data.length-1));
-    active=i;
-    const token=++loadToken;
-    const p=data[i];
-
-    buttons.forEach((b,j)=>b.classList.toggle('active',j===i));
-    current.textContent=p.name||('Program '+(i+1));
-    setStatus('Loading · '+(i+1)+' of '+data.length,false);
-
-    frame.removeAttribute('src');
-    frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:32px;color:#64748b"><b>Loading '+String(p.name||'program').replace(/[<&]/g,'')+'…</b></body></html>';
-
-    try{
-      const html=await programHtml(p);
-      if(token!==loadToken) return;
-      frame.srcdoc=html;
-      setStatus((p.mode==='embedded'?'Loaded locally':'Loaded program')+' · '+(i+1)+' of '+data.length,false);
-    }catch(err){
-      if(token!==loadToken) return;
-      const msg=(err&&err.message)?err.message:String(err);
-      frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:32px"><h2 style="color:#17365d">'+String(p.name||'Program').replace(/[<&]/g,'')+'</h2><p style="color:#b42318;font-weight:700">Unable to load this program.</p><p style="color:#64748b">'+msg.replace(/[<&]/g,'')+'</p></body></html>';
-      setStatus('Load error · '+msg,true);
-    }
-
-    try{localStorage.setItem('chris_f_hub:last',String(i));}catch(e){}
-    if(buttons[i]) buttons[i].scrollIntoView({block:'nearest'});
-  }
-
-  async function start(){
-    try{
-      const response=await fetch(SOURCE+'?v=reviewed-20261001',{cache:'no-store'});
-      if(!response.ok) throw new Error('Could not read '+SOURCE+' ('+response.status+')');
-      const source=await response.text();
-
-      const match=source.match(/<script\s+id=["']programData["'][^>]*>([\s\S]*?)<\/script>/i);
-      if(!match) throw new Error('Program data was not found.');
-
-      let payload=match[1].trim();
-
-      // Older Chris source escaped the JSON as HTML entities.
-      if(/&quot;|&#34;|&amp;/.test(payload.slice(0,1000))) payload=decodeEntities(payload);
-
-      data=JSON.parse(payload);
-      if(!Array.isArray(data)||!data.length) throw new Error('Program list is empty.');
-
-      buildButtons();
-
-      let saved=0;
-      try{saved=Number(localStorage.getItem('chris_f_hub:last')||0);}catch(e){}
-      if(!Number.isFinite(saved)||saved<0||saved>=data.length) saved=0;
-      load(saved);
-    }catch(err){
-      const msg=(err&&err.message)?err.message:String(err);
-      current.textContent='Chris F. Program Hub';
-      items.innerHTML='<div class="loading" style="color:#b42318">Program hub could not be loaded.</div>';
-      setStatus(msg,true);
-      frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:40px"><h2>Chris F. Program Hub</h2><p style="color:#b42318;font-weight:700">'+msg.replace(/[<&]/g,'')+'</p></body></html>';
-    }
-  }
-
-  function syncStudentContext(){
-    try{
-      const doc=frame.contentDocument;
-      if(!doc) return;
-      const name=doc.getElementById('studentName');
-      if(name) name.textContent='Chris F.';
-      const provider=doc.getElementById('providerName');
-      if(provider) provider.textContent=(adultSupport.value||'Adult Support').trim()||'Adult Support';
-    }catch(e){}
-  }
-
-  try{adultSupport.value=localStorage.getItem('chris_f_hub:adult_support')||'';}catch(e){}
-  adultSupport.addEventListener('input',()=>{
-    try{localStorage.setItem('chris_f_hub:adult_support',adultSupport.value.trim());}catch(e){}
-    syncStudentContext();
-  });
-  frame.addEventListener('load',syncStudentContext);
-
-  prev.addEventListener('click',()=>load(active-1));
-  next.addEventListener('click',()=>load(active+1));
-  full.addEventListener('click',()=>{
-    const on=app.classList.toggle('program-full');
-    full.textContent=on?'Show Programs List':'Open Full Screen';
-    full.setAttribute('aria-pressed',String(on));
-  });
-
-  start();
+  function buildButtons(){items.innerHTML='';data.forEach((p,i)=>{const b=document.createElement('button');b.className='program';b.type='button';b.dataset.i=String(i);const n=document.createElement('span');n.textContent=String(i+1).padStart(2,'0');const label=document.createElement('b');label.textContent=p.name||('Program '+(i+1));b.append(n,label);b.addEventListener('click',()=>load(i));items.appendChild(b)});buttons=[...items.querySelectorAll('.program')];count.textContent=data.length+' programs';prev.disabled=false;next.disabled=false}
+  async function load(i){if(!data.length)return;i=Math.max(0,Math.min(i,data.length-1));active=i;const token=++loadToken,p=data[i];buttons.forEach((b,j)=>b.classList.toggle('active',j===i));current.textContent=p.name||('Program '+(i+1));setStatus('Loading · '+(i+1)+' of '+data.length,false);frame.removeAttribute('src');frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:32px;color:#64748b"><b>Loading program…</b></body></html>';try{const html=await programHtml(p);if(token!==loadToken)return;frame.srcdoc=html;setStatus((p.mode==='embedded'?'Loaded locally':'Loaded program')+' · '+(i+1)+' of '+data.length,false)}catch(err){if(token!==loadToken)return;const msg=err&&err.message?err.message:String(err);frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:32px"><h2>'+String(p.name||'Program').replace(/[<&]/g,'')+'</h2><p style="color:#b42318;font-weight:700">Unable to load this program.</p><p>'+msg.replace(/[<&]/g,'')+'</p></body></html>';setStatus('Load error · '+msg,true)}try{localStorage.setItem('chris_f_hub:last',String(i))}catch(e){}if(buttons[i])buttons[i].scrollIntoView({block:'nearest'})}
+  async function start(){try{const response=await fetch(SOURCE+'?v=reviewed-20261005b',{cache:'no-store'});if(!response.ok)throw new Error('Could not read '+SOURCE+' ('+response.status+')');const source=await response.text(),match=source.match(/<script\s+id=["']programData["'][^>]*>([\s\S]*?)<\/script>/i);if(!match)throw new Error('Program data was not found.');let payload=match[1].trim();if(/&quot;|&#34;|&amp;/.test(payload.slice(0,1000)))payload=decodeEntities(payload);data=JSON.parse(payload);if(!Array.isArray(data)||!data.length)throw new Error('Program list is empty.');buildButtons();let saved=0;try{saved=Number(localStorage.getItem('chris_f_hub:last')||0)}catch(e){}if(!Number.isFinite(saved)||saved<0||saved>=data.length)saved=0;load(saved)}catch(err){const msg=err&&err.message?err.message:String(err);current.textContent='Chris F. Program Hub';items.innerHTML='<div class="loading" style="color:#b42318">Program hub could not be loaded.</div>';setStatus(msg,true)}}
+  function syncStudentContext(){try{const doc=frame.contentDocument;if(!doc)return;const name=doc.getElementById('studentName');if(name)name.textContent='Chris F.';const provider=doc.getElementById('providerName');if(provider)provider.textContent=(adultSupport.value||'Adult Support').trim()||'Adult Support'}catch(e){}}
+  try{adultSupport.value=localStorage.getItem('chris_f_hub:adult_support')||''}catch(e){}
+  adultSupport.addEventListener('input',()=>{try{localStorage.setItem('chris_f_hub:adult_support',adultSupport.value.trim())}catch(e){}syncStudentContext()});frame.addEventListener('load',syncStudentContext);
+  prev.addEventListener('click',()=>load(active-1));next.addEventListener('click',()=>load(active+1));full.addEventListener('click',()=>{const on=app.classList.toggle('program-full');full.textContent=on?'Show Programs List':'Open Full Screen';full.setAttribute('aria-pressed',String(on))});start();
 })();
 </script>
 </body>
