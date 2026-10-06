@@ -8,206 +8,74 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Chris Programs">
 <meta name="theme-color" content="#eef4fa">
-<link rel="manifest" href="manifest.webmanifest">
 <title>Chris F. — Student Program Hub</title>
 <style>
-:root{--blue:#1677ff;--navy:#17365d;--line:#dbe6f2;--muted:#64748b;--bg:#eef4fa;--danger:#b42318}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--navy);overscroll-behavior:none;-webkit-text-size-adjust:100%}
-body{overflow:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);touch-action:manipulation}
-.app{height:100dvh;display:grid;grid-template-columns:300px minmax(0,1fr)}
-aside{background:#fff;border-right:1px solid var(--line);padding:12px;overflow:auto;-webkit-overflow-scrolling:touch}
-h1{font-size:22px;margin:0 0 4px}.muted{color:var(--muted);font-size:13px}
-.student{margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:10px;background:#f8fbff;line-height:1.5}
-.pill,.ipad-badge{display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;background:#eaf3ff;color:#145ea8;font-size:12px;font-weight:900}
-.items{display:grid;gap:6px;padding-bottom:18px}
-.program{min-height:52px;width:100%;text-align:left;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--navy);padding:8px;display:grid;grid-template-columns:34px minmax(0,1fr);gap:5px;align-items:center;touch-action:manipulation;cursor:pointer}
-.program.active{outline:3px solid var(--blue);background:#f6faff}.program span{font-weight:900;color:var(--muted)}
-main{min-width:0;min-height:0;padding:10px;display:flex;flex-direction:column}
-.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
-#current{font-weight:900;font-size:19px;margin-right:auto}
-.btn{min-height:44px;padding:9px 12px;border:1px solid #bfd0e2;border-radius:8px;background:#fff;color:#145ea8;font-weight:800;touch-action:manipulation;cursor:pointer}
-.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}.btn:disabled{opacity:.45;cursor:not-allowed}
-#status{width:100%;font-size:12px;color:var(--muted)}#status.error{color:var(--danger);font-weight:700}
-iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius:10px;background:#fff}
-.app.program-full{grid-template-columns:minmax(0,1fr)}.app.program-full aside{display:none}.app.program-full main{padding:0}
-.app.program-full .toolbar{padding:8px 10px;margin:0;background:#fff;border-bottom:1px solid var(--line)}.app.program-full iframe{border:0;border-radius:0}
-.loading{padding:18px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--muted);font-weight:700}
-.support-label{display:block;font-size:12px;font-weight:900;color:#49657f;margin-bottom:8px}
-.support-label input{width:100%;min-height:44px;margin-top:5px;padding:8px 10px;border:1px solid #bfd0e2;border-radius:8px;font-size:16px;color:var(--navy);background:#fff}
-@media(min-width:701px) and (max-width:1100px){.app{grid-template-columns:250px minmax(0,1fr)}aside{padding:9px}.program{min-height:52px}.program b{font-size:13px}.btn{min-height:48px;padding:9px 11px}main{padding:8px}.toolbar{gap:6px;margin-bottom:6px}#current{font-size:17px}.student{padding:9px}.items{gap:6px}}
+:root{--blue:#1677ff;--navy:#17365d;--line:#dbe6f2;--muted:#64748b;--bg:#eef4fa;--danger:#b42318}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--navy);overscroll-behavior:none;-webkit-text-size-adjust:100%}body{overflow:hidden;touch-action:manipulation}
+.app{height:100dvh;display:grid;grid-template-columns:300px minmax(0,1fr)}aside{background:#fff;border-right:1px solid var(--line);padding:12px;overflow:auto;-webkit-overflow-scrolling:touch}
+h1{font-size:22px;margin:0 0 4px}.muted{color:var(--muted);font-size:13px}.student{margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:12px;background:#f8fbff;line-height:1.5}
+.pill{display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;background:#eaf3ff;color:#145ea8;font-size:12px;font-weight:900}.items{display:grid;gap:6px;padding-bottom:18px}
+.program{min-height:52px;width:100%;text-align:left;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--navy);padding:8px;display:grid;grid-template-columns:34px minmax(0,1fr);gap:5px;align-items:center;cursor:pointer}
+.program.active{outline:3px solid var(--blue);background:#f6faff}.program span{font-weight:900;color:var(--muted)}main{min-width:0;min-height:0;padding:10px;display:flex;flex-direction:column}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}#current{font-weight:900;font-size:19px;margin-right:auto}.btn{min-height:46px;padding:9px 12px;border:1px solid #bfd0e2;border-radius:9px;background:#fff;color:#145ea8;font-weight:800;cursor:pointer}.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}.btn:disabled{opacity:.45}
+#status{width:100%;font-size:12px;color:var(--muted)}#status.error{color:var(--danger);font-weight:700}iframe{width:100%;flex:1;min-height:0;border:1px solid var(--line);border-radius:12px;background:#fff}
+.app.program-full{grid-template-columns:1fr}.app.program-full aside{display:none}.app.program-full main{padding:0}.app.program-full .toolbar{padding:8px 10px;margin:0;background:#fff;border-bottom:1px solid var(--line)}.app.program-full iframe{border:0;border-radius:0}
+.loading{padding:18px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--muted);font-weight:700}.support-label{display:block;font-size:12px;font-weight:900;color:#49657f;margin-bottom:8px}.support-label input{width:100%;min-height:44px;margin-top:5px;padding:8px 10px;border:1px solid #bfd0e2;border-radius:8px;font-size:16px;color:var(--navy);background:#fff}
+@media(min-width:701px) and (max-width:1100px){.app{grid-template-columns:250px minmax(0,1fr)}aside{padding:9px}.btn{min-height:48px}main{padding:8px}}
 @media(max-width:680px){body{overflow:auto}.app{height:auto;min-height:100dvh;grid-template-columns:1fr}aside{max-height:36vh;border-right:0;border-bottom:1px solid var(--line)}main{height:64vh;min-height:520px}}
 </style>
 </head>
 <body>
 <div class="app" id="app">
-  <aside>
-    <h1>Chris F.</h1>
-    <div class="muted">Student Program Hub</div>
-    <div class="student">
-      <label class="support-label">Adult Support<input id="adultSupport" autocomplete="off" placeholder="Enter name"></label>
-      <span class="muted"><b>Behaviors:</b> Non-Compliance · Tantrum · Work Avoidance · Out of Area</span><br>
-      <span class="muted" id="count">Loading programs…</span><br>
-      <span class="pill">Staff Scored</span> <span class="ipad-badge">iPad 7 Ready</span>
-    </div>
-    <div class="items" id="items"><div class="loading">Loading Chris programs…</div></div>
-  </aside>
-  <main>
-    <div class="toolbar">
-      <div id="current">Loading program hub…</div>
-      <button class="btn" id="prev" type="button" disabled>Previous Program</button>
-      <button class="btn primary" id="next" type="button" disabled>Next Program</button>
-      <button class="btn" id="full" type="button">Open Full Screen</button>
-      <div id="status">Reading program library…</div>
-    </div>
-    <iframe id="frame" title="Active Program"></iframe>
-  </main>
+<aside>
+<h1>Chris F.</h1><div class="muted">Student Program Hub</div>
+<div class="student"><label class="support-label">Adult Support<input id="adultSupport" autocomplete="off" placeholder="Enter name"></label>
+<span class="muted"><b>Behaviors:</b> Non-Compliance · Tantrum · Work Avoidance · Out of Area</span><br><span class="muted" id="count">Loading programs…</span><br>
+<span class="pill">Staff Scored</span> <span class="pill">iPad 7 Ready</span></div>
+<div class="items" id="items"><div class="loading">Loading Chris programs…</div></div>
+</aside>
+<main><div class="toolbar"><div id="current">Loading program hub…</div><button class="btn" id="prev" type="button" disabled>Previous Program</button><button class="btn primary" id="next" type="button" disabled>Next Program</button><button class="btn" id="full" type="button">Open Full Screen</button><div id="status">Reading program library…</div></div><iframe id="frame" title="Active Program"></iframe></main>
 </div>
 <script>
 (function(){
-const SOURCE='hub-source.html';
+'use strict';
+const SOURCE='hub-source.html',OVERRIDE='subtraction.html?v=20261005-final';
 const app=document.getElementById('app'),items=document.getElementById('items'),count=document.getElementById('count'),frame=document.getElementById('frame'),current=document.getElementById('current'),prev=document.getElementById('prev'),next=document.getElementById('next'),full=document.getElementById('full'),status=document.getElementById('status'),adultSupport=document.getElementById('adultSupport');
 let data=[],buttons=[],active=0,loadToken=0;const remoteCache=new Map();
 function setStatus(m,e){status.textContent=m;status.classList.toggle('error',!!e)}
 function decodeEntities(v){const b=document.createElement('textarea');b.innerHTML=String(v||'');return b.value}
 function decode64(b64){const binary=atob(b64),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return new TextDecoder('utf-8').decode(bytes)}
-const IPAD_STYLE=`<style id="chris-ipad7-v5">
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%}body{overscroll-behavior:none}button,select,input,textarea{-webkit-tap-highlight-color:transparent;touch-action:manipulation}button{-webkit-user-select:none;user-select:none}select,input,textarea{font-size:16px}.choice,.action,.btn,.endbtn,.setup-toggle,.apply,.save,.minus,.plus{min-height:44px}.behavior{min-height:48px}
-@media (min-width:701px) and (max-width:1100px){.main{padding:10px}.topbar,.student-card,.program-card,.sessionbar{margin-bottom:8px}.program-setup{padding:18px 20px 14px}.setup-title{font-size:23px}.setup-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 18px}.setup-field select,.setup-field input{min-height:54px;font-size:18px}.instruction{font-size:32px}.response-row{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.action{min-height:54px}.choice{min-height:135px}.behaviorbar{gap:8px;padding:10px}}
-</style>`;
-function behaviorGuardScript(){return `<script id="chris-behavior-guard">(function(){
-var allowed=['non-compliance','tantrum','work avoidance','out of area'];
-function clean(){[].slice.call(document.querySelectorAll('button,.behavior,.behavior-item,[data-behavior],.behavior-card')).forEach(function(el){
-var t=(el.getAttribute('data-behavior')||el.textContent||'').trim().toLowerCase().replace(/\\s+/g,' ');
-var looks=t&&(el.classList.contains('behavior')||el.classList.contains('behavior-item')||el.classList.contains('behavior-card')||el.hasAttribute('data-behavior')||el.closest('.behaviorbar,.behavior-bar,.behaviors,.behavior-section'));
-if(!looks)return;var keep=allowed.some(function(a){return t===a||t.indexOf(a)>=0});if(!keep)el.remove()})}
-clean();new MutationObserver(clean).observe(document.documentElement,{childList:true,subtree:true});
-})();<\/script>`}
-function letterTracingScript(){return `<style id="chris-letter-tracing-style">
-body{padding-bottom:118px!important}
-#chrisLetterControls{position:fixed;left:0;right:0;bottom:0;z-index:2147483646;background:#fff;border-top:2px solid #dbe6f2;padding:9px 10px calc(9px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:8px;box-shadow:0 -5px 18px rgba(15,23,42,.14)}
-#chrisLetterControls button{min-height:58px;border-radius:12px;border:2px solid #bfd0e2;background:#fff;font-size:20px;font-weight:900;color:#17365d;touch-action:manipulation}
-#chrisLetterControls button[data-score="correct"].selected{background:#eaf8ef;border-color:#2f855a}
-#chrisLetterControls button[data-score="incorrect"].selected{background:#fff1f1;border-color:#c53030}
-#chrisNextTrial{background:#1677ff!important;color:#fff!important;border-color:#1677ff!important}
-#chrisRepeatStatus{grid-column:1/-1;text-align:center;font-size:13px;font-weight:800;color:#64748b;line-height:1.2}
-.chris-repeat-field label{display:block;font-weight:800;margin-bottom:7px}
-.chris-repeat-field select{width:100%;min-height:54px;border:1px solid #bfd0e2;border-radius:10px;padding:8px 12px;background:#fff;color:#17365d;font-size:18px}
-</style><script id="chris-letter-tracing-controls">(function(){
-if(window.__chrisLetterTracingInstalled)return;window.__chrisLetterTracingInstalled=true;
-var repeatTarget=1,repeatIndex=0,score='',target=null,lastTargetValue=null;
-function textOf(el){return ((el&&((el.textContent||el.value||el.getAttribute&&el.getAttribute('aria-label'))))||'').trim().toLowerCase()}
-function allButtons(){return [].slice.call(document.querySelectorAll('button,[role="button"],input[type="button"],input[type="submit"]'))}
-function isOurs(el){return !!(el&&el.closest&&el.closest('#chrisLetterControls'))}
-function findButton(words){return allButtons().find(function(el){if(isOurs(el))return false;var t=textOf(el);return words.some(function(w){return t===w||t.indexOf(w)>=0})})||null}
-function clickButton(words){var el=findButton(words);if(!el)return false;try{el.click();return true}catch(e){return false}}
-function scoreUnderlying(kind){var words=kind==='correct'?['correct','right']:['incorrect','wrong'];var b=findButton(words);if(b)try{b.click()}catch(e){}}
-function looksLikeLetterSelect(s){
-var meta=((s.name||'')+' '+(s.id||'')+' '+(s.getAttribute('aria-label')||'')+' '+((s.previousElementSibling&&s.previousElementSibling.textContent)||'')+' '+((s.parentElement&&s.parentElement.textContent)||'')).toLowerCase();
-if(/letter|target|character|alphabet/.test(meta))return true;
-var vals=[].slice.call(s.options||[]).map(function(o){return (o.value||o.textContent||'').trim()}).filter(Boolean);
-var letters=vals.filter(function(v){return /^[a-z]$/i.test(v)}).length;
-return letters>=Math.min(8,Math.max(3,Math.floor(vals.length*.5)));
-}
-function getTargetSelect(){return [].slice.call(document.querySelectorAll('select')).find(looksLikeLetterSelect)||null}
-function addRepeatSetup(){
-if(document.getElementById('chrisRepeatTrials'))return;
-var field=document.createElement('div');field.className='setup-field chris-repeat-field';
-var opts='';for(var i=1;i<=20;i++)opts+='<option value="'+i+'">'+i+' trial'+(i===1?'':'s')+'</option>';
-field.innerHTML='<label for="chrisRepeatTrials">Trials per letter</label><select id="chrisRepeatTrials" aria-label="Trials per letter">'+opts+'</select>';
-var grid=document.querySelector('.setup-grid,.program-setup .grid,.setup-body .grid');
-if(grid)grid.appendChild(field);else{var setup=document.querySelector('.program-setup,.setup-body,.setup-panel,.settings,.setup');if(setup)setup.appendChild(field);else document.body.insertBefore(field,document.body.firstChild)}
-var sel=document.getElementById('chrisRepeatTrials');try{var saved=parseInt(localStorage.getItem('chris_letter_trials')||'1',10);if(saved>=1&&saved<=20)sel.value=String(saved)}catch(e){}
-repeatTarget=Math.max(1,parseInt(sel.value,10)||1);
-sel.addEventListener('change',function(){repeatTarget=Math.max(1,parseInt(sel.value,10)||1);repeatIndex=0;try{localStorage.setItem('chris_letter_trials',String(repeatTarget))}catch(e){}updateStatus()});
-}
-var bar=document.createElement('div');bar.id='chrisLetterControls';
-bar.innerHTML='<button type="button" data-score="correct">Correct</button><button type="button" data-score="incorrect">Incorrect</button><button type="button" id="chrisNextTrial">Next Trial</button><div id="chrisRepeatStatus">Letter Tracing</div>';
-document.body.appendChild(bar);
-function mark(v){score=v;bar.querySelectorAll('[data-score]').forEach(function(b){b.classList.toggle('selected',b.getAttribute('data-score')===v)});scoreUnderlying(v)}
-bar.querySelector('[data-score="correct"]').addEventListener('click',function(){mark('correct')});
-bar.querySelector('[data-score="incorrect"]').addEventListener('click',function(){mark('incorrect')});
-function erase(){
-var clear=findButton(['erase','clear tracing','clear drawing','clear canvas','reset drawing','clear']);
-if(clear)try{clear.click()}catch(e){}
-document.querySelectorAll('canvas').forEach(function(c){try{var ctx=c.getContext('2d');if(ctx){ctx.clearRect(0,0,c.width,c.height);c.dispatchEvent(new Event('change',{bubbles:true}))}}catch(e){}});
-document.querySelectorAll('svg .trace-line,svg .user-line,svg .drawing,svg [data-user="true"],svg [data-drawn="true"]').forEach(function(e){try{e.remove()}catch(x){}});
-}
-function advanceLetter(){
-target=getTargetSelect();
-if(target&&target.options&&target.options.length>1){
-var old=target.selectedIndex,next=old+1;if(next>=target.options.length)next=0;
-target.selectedIndex=next;target.dispatchEvent(new Event('input',{bubbles:true}));target.dispatchEvent(new Event('change',{bubbles:true}));lastTargetValue=target.value;return true;
-}
-return clickButton(['next letter','next target','next character']);
-}
-function updateStatus(){
-var out=document.getElementById('chrisRepeatStatus');if(!out)return;
-out.textContent=repeatTarget>1?'Same letter · Trial '+(repeatIndex+1)+' of '+repeatTarget:'Trial 1 of 1 · Next Trial advances to next letter';
-}
-function nextTrial(){
-erase();
-repeatIndex++;
-if(repeatIndex>=repeatTarget){repeatIndex=0;advanceLetter()}
-score='';bar.querySelectorAll('[data-score]').forEach(function(b){b.classList.remove('selected')});updateStatus();
-}
-document.getElementById('chrisNextTrial').addEventListener('click',nextTrial);
-function bindTarget(){var t=getTargetSelect();if(t&&t!==target){target=t;lastTargetValue=t.value;t.addEventListener('change',function(){if(t.value!==lastTargetValue){lastTargetValue=t.value;repeatIndex=0;updateStatus()}})}}
-addRepeatSetup();bindTarget();updateStatus();
-new MutationObserver(function(){addRepeatSetup();bindTarget()}).observe(document.documentElement,{childList:true,subtree:true});
-})();<\/script>`}
+const IPAD_STYLE=`<style id="chris-ipad7-final">html{-webkit-text-size-adjust:100%;text-size-adjust:100%}body{overscroll-behavior:none}button,select,input,textarea{-webkit-tap-highlight-color:transparent;touch-action:manipulation}select,input,textarea{font-size:16px}.choice,.action,.btn,.endbtn,.setup-toggle,.apply,.save,.minus,.plus{min-height:44px}.behavior{min-height:48px}@media(min-width:701px) and (max-width:1100px){.main{padding:10px}.setup-field select,.setup-field input{min-height:54px;font-size:18px}.action{min-height:54px}.choice{min-height:135px}}</style>`;
+function behaviorGuard(){return `<script id="chris-behavior-guard">(function(){var allowed=['non-compliance','tantrum','work avoidance','out of area'];function clean(){[].slice.call(document.querySelectorAll('button,.behavior,.behavior-item,[data-behavior],.behavior-card')).forEach(function(el){var t=(el.getAttribute('data-behavior')||el.textContent||'').trim().toLowerCase().replace(/\\s+/g,' '),looks=t&&(el.classList.contains('behavior')||el.classList.contains('behavior-item')||el.classList.contains('behavior-card')||el.hasAttribute('data-behavior')||el.closest('.behaviorbar,.behavior-bar,.behaviors,.behavior-section'));if(!looks)return;if(!allowed.some(function(a){return t===a||t.indexOf(a)>=0}))el.remove()})}clean();new MutationObserver(clean).observe(document.documentElement,{childList:true,subtree:true})})();<\/script>`}
 function inject(text,addon){return /<\/body>/i.test(text)?text.replace(/<\/body>/i,addon+'</body>'):text+addon}
-function isLetterTracing(programName,text){
-var n=String(programName||'').toLowerCase();
-if(n.indexOf('letter tracing')>=0||n.indexOf('letter trace')>=0)return true;
-if(n.indexOf('letter')>=0&&(n.indexOf('trac')>=0||n.indexOf('formation')>=0||n.indexOf('writing')>=0))return true;
-var sample=String(text||'').slice(0,120000).toLowerCase();
-return /letter\s*trac|trace\s+(the\s+)?letter|tracing\s+letter/.test(sample);
-}
-function normalizeHtml(value,programName){
+function normalizeHtml(value){
 let text=String(value||'').trim().replace(/^\s*```(?:html)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
 if(!/<(?:!doctype|html|head|body|div|section|main|style|script)\b/i.test(text)&&/&lt;\/?(?:!doctype|html|head|body|div|section|main|style|script)/i.test(text))text=decodeEntities(text).trim();
 if(!/<(?:!doctype|html|head|body)\b/i.test(text))text='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"></head><body>'+text+'</body></html>';
 if(/<meta\s+name=["']viewport["'][^>]*>/i.test(text))text=text.replace(/<meta\s+name=["']viewport["'][^>]*>/i,'<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">');
 else if(/<head[^>]*>/i.test(text))text=text.replace(/<head([^>]*)>/i,'<head$1><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">');
-if(!/id=["']chris-ipad7-v5["']/i.test(text))text=/<\/head>/i.test(text)?text.replace(/<\/head>/i,IPAD_STYLE+'</head>'):IPAD_STYLE+text;
-if(!/id=["']chris-behavior-guard["']/i.test(text))text=inject(text,behaviorGuardScript());
-if(isLetterTracing(programName,text)&&!/id=["']chris-letter-tracing-controls["']/i.test(text))text=inject(text,letterTracingScript());
+if(!/id=["']chris-ipad7-final["']/i.test(text))text=/<\/head>/i.test(text)?text.replace(/<\/head>/i,IPAD_STYLE+'</head>'):IPAD_STYLE+text;
+if(!/id=["']chris-behavior-guard["']/i.test(text))text=inject(text,behaviorGuard());
 return text;
 }
-async function getRemoteHtml(url,programName){
-const key=url+'|'+programName;if(remoteCache.has(key))return remoteCache.get(key);
-const task=(async()=>{const u=new URL(url,location.href);if(u.hostname.endsWith('.supabase.co')&&u.pathname.includes('/functions/v1/compass-program-runner'))u.searchParams.set('format','json');
-const response=await fetch(u.toString(),{method:'GET',mode:'cors',cache:'no-store',headers:{Accept:'application/json, text/plain;q=0.9, */*;q=0.8'}});
-if(!response.ok)throw new Error('Program request failed ('+response.status+')');const raw=await response.text();let programHtml=raw;
-try{const obj=JSON.parse(raw);if(obj&&typeof obj.html==='string')programHtml=obj.html;else if(obj&&obj.ok===false)throw new Error(obj.error||'Program unavailable')}
-catch(err){if(/^\s*[{[]/.test(raw)&&!/<(?:!doctype|html|body|div|style|script)\b/i.test(raw))throw err}
-return normalizeHtml(programHtml,programName)})();
+async function getRemoteHtml(url){
+const key=url;if(remoteCache.has(key))return remoteCache.get(key);
+const task=(async()=>{const u=new URL(url,location.href);if(u.hostname.endsWith('.supabase.co')&&u.pathname.includes('/functions/v1/compass-program-runner'))u.searchParams.set('format','json');const response=await fetch(u.toString(),{method:'GET',mode:'cors',cache:'no-store',headers:{Accept:'application/json, text/plain;q=0.9, */*;q=0.8'}});if(!response.ok)throw new Error('Program request failed ('+response.status+')');const raw=await response.text();let html=raw;try{const obj=JSON.parse(raw);if(obj&&typeof obj.html==='string')html=obj.html;else if(obj&&obj.ok===false)throw new Error(obj.error||'Program unavailable')}catch(err){if(/^\s*[{[]/.test(raw)&&!/<(?:!doctype|html|body|div|style|script)\b/i.test(raw))throw err}return normalizeHtml(html)})();
 remoteCache.set(key,task);try{return await task}catch(err){remoteCache.delete(key);throw err}
 }
-async function programHtml(program){if(program.mode==='embedded'&&program.b64)return normalizeHtml(decode64(program.b64),program.name);if(program.url)return getRemoteHtml(program.url,program.name);throw new Error('Program source is not available in this hub build.')}
-function buildButtons(){items.innerHTML='';data.forEach((p,i)=>{const b=document.createElement('button');b.className='program';b.type='button';b.dataset.i=String(i);const n=document.createElement('span');n.textContent=String(i+1).padStart(2,'0');const label=document.createElement('b');label.textContent=p.name||('Program '+(i+1));b.append(n,label);b.addEventListener('click',()=>load(i));items.appendChild(b)});buttons=[...items.querySelectorAll('.program')];count.textContent=data.length+' programs';prev.disabled=false;next.disabled=false}
-async function load(i){
-if(!data.length)return;i=Math.max(0,Math.min(i,data.length-1));active=i;const token=++loadToken,p=data[i];
-buttons.forEach((b,j)=>b.classList.toggle('active',j===i));current.textContent=p.name||('Program '+(i+1));setStatus('Loading · '+(i+1)+' of '+data.length,false);
-frame.removeAttribute('src');frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:32px;color:#64748b"><b>Loading program…</b></body></html>';
-try{const h=await programHtml(p);if(token!==loadToken)return;frame.srcdoc=h;setStatus((p.mode==='embedded'?'Loaded locally':'Loaded program')+' · '+(i+1)+' of '+data.length,false)}
-catch(err){if(token!==loadToken)return;const msg=err&&err.message?err.message:String(err);frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:32px"><h2>'+String(p.name||'Program').replace(/[<&]/g,'')+'</h2><p style="color:#b42318;font-weight:700">Unable to load this program.</p><p>'+msg.replace(/[<&]/g,'')+'</p></body></html>';setStatus('Load error · '+msg,true)}
-try{localStorage.setItem('chris_f_hub:last',String(i))}catch(e){}if(buttons[i])buttons[i].scrollIntoView({block:'nearest'})
+async function programHtml(program){
+if(/\bsubtraction\b/i.test(String(program.name||''))){const r=await fetch(OVERRIDE,{cache:'no-store'});if(!r.ok)throw new Error('Subtraction runner unavailable ('+r.status+')');return await r.text()}
+if(program.mode==='embedded'&&program.b64)return normalizeHtml(decode64(program.b64));
+if(program.url)return getRemoteHtml(program.url);
+throw new Error('Program source is not available in this hub build.');
 }
-async function start(){
-try{const response=await fetch(SOURCE+'?v=reviewed-20261005d',{cache:'no-store'});if(!response.ok)throw new Error('Could not read '+SOURCE+' ('+response.status+')');
-const source=await response.text(),match=source.match(/<script\s+id=["']programData["'][^>]*>([\s\S]*?)<\/script>/i);if(!match)throw new Error('Program data was not found.');
-let payload=match[1].trim();if(/&quot;|&#34;|&amp;/.test(payload.slice(0,1000)))payload=decodeEntities(payload);data=JSON.parse(payload);if(!Array.isArray(data)||!data.length)throw new Error('Program list is empty.');
-buildButtons();let saved=0;try{saved=Number(localStorage.getItem('chris_f_hub:last')||0)}catch(e){}if(!Number.isFinite(saved)||saved<0||saved>=data.length)saved=0;load(saved)
-}catch(err){const msg=err&&err.message?err.message:String(err);current.textContent='Chris F. Program Hub';items.innerHTML='<div class="loading" style="color:#b42318">Program hub could not be loaded.</div>';setStatus(msg,true)}
-}
+function buildButtons(){items.innerHTML='';data.forEach((p,i)=>{const b=document.createElement('button');b.className='program';b.type='button';const n=document.createElement('span');n.textContent=String(i+1).padStart(2,'0');const label=document.createElement('b');label.textContent=p.name||('Program '+(i+1));b.append(n,label);b.addEventListener('click',()=>load(i));items.appendChild(b)});buttons=[...items.querySelectorAll('.program')];count.textContent=data.length+' programs';prev.disabled=false;next.disabled=false}
+async function load(i){if(!data.length)return;i=Math.max(0,Math.min(i,data.length-1));active=i;const token=++loadToken,p=data[i];buttons.forEach((b,j)=>b.classList.toggle('active',j===i));current.textContent=p.name||('Program '+(i+1));setStatus('Loading · '+(i+1)+' of '+data.length,false);frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:32px;color:#64748b"><b>Loading program…</b></body></html>';try{const h=await programHtml(p);if(token!==loadToken)return;frame.srcdoc=h;setStatus('Ready · '+(i+1)+' of '+data.length,false)}catch(err){if(token!==loadToken)return;const msg=err&&err.message?err.message:String(err);frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:32px"><h2>Program unavailable</h2><p style="color:#b42318;font-weight:700">'+msg.replace(/[<&]/g,'')+'</p></body></html>';setStatus(msg,true)}try{localStorage.setItem('chris_f_hub:last',String(i))}catch(e){}if(buttons[i])buttons[i].scrollIntoView({block:'nearest'})}
+async function start(){try{const response=await fetch(SOURCE+'?v=20261005-final',{cache:'no-store'});if(!response.ok)throw new Error('Could not read '+SOURCE+' ('+response.status+')');const source=await response.text(),match=source.match(/<script\s+id=["']programData["'][^>]*>([\s\S]*?)<\/script>/i);if(!match)throw new Error('Program data was not found.');let payload=match[1].trim();if(/&quot;|&#34;|&amp;/.test(payload.slice(0,1000)))payload=decodeEntities(payload);data=JSON.parse(payload);if(!Array.isArray(data)||!data.length)throw new Error('Program list is empty.');buildButtons();let saved=0;try{saved=Number(localStorage.getItem('chris_f_hub:last')||0)}catch(e){}if(!Number.isFinite(saved)||saved<0||saved>=data.length)saved=0;load(saved)}catch(err){const msg=err&&err.message?err.message:String(err);current.textContent='Chris F. Program Hub';items.innerHTML='<div class="loading" style="color:#b42318">Program hub could not be loaded.</div>';setStatus(msg,true)}}
 function syncStudentContext(){try{const doc=frame.contentDocument;if(!doc)return;const name=doc.getElementById('studentName');if(name)name.textContent='Chris F.';const provider=doc.getElementById('providerName');if(provider)provider.textContent=(adultSupport.value||'Adult Support').trim()||'Adult Support'}catch(e){}}
 try{adultSupport.value=localStorage.getItem('chris_f_hub:adult_support')||''}catch(e){}
-adultSupport.addEventListener('input',()=>{try{localStorage.setItem('chris_f_hub:adult_support',adultSupport.value.trim())}catch(e){}syncStudentContext()});
-frame.addEventListener('load',syncStudentContext);
-prev.addEventListener('click',()=>load(active-1));next.addEventListener('click',()=>load(active+1));
-full.addEventListener('click',()=>{const on=app.classList.toggle('program-full');full.textContent=on?'Show Programs List':'Open Full Screen';full.setAttribute('aria-pressed',String(on))});
+adultSupport.addEventListener('input',()=>{try{localStorage.setItem('chris_f_hub:adult_support',adultSupport.value.trim())}catch(e){}syncStudentContext()});frame.addEventListener('load',syncStudentContext);
+prev.addEventListener('click',()=>load(active-1));next.addEventListener('click',()=>load(active+1));full.addEventListener('click',()=>{const on=app.classList.toggle('program-full');full.textContent=on?'Show Programs List':'Open Full Screen';full.setAttribute('aria-pressed',String(on))});
 start();
 })();
 </script>
