@@ -50,20 +50,45 @@ const IPAD_STYLE=`<style id="chris-ipad7-final">html{-webkit-text-size-adjust:10
 function behaviorGuard(){return `<script id="chris-behavior-guard">(function(){
 var allowed=['non-compliance','tantrum','work avoidance','out of area'];
 function norm(v){return String(v||'').toLowerCase().replace(/\\b\\d+\\b/g,'').replace(/[^a-z -]/g,' ').replace(/\\s+/g,' ').trim()}
-function behaviorName(el){var raw=el.getAttribute&&el.getAttribute('data-behavior');var t=norm(raw||el.textContent||'');for(var i=0;i<allowed.length;i++){if(t===allowed[i]||t.indexOf(allowed[i])===0)return allowed[i]}return ''}
+function behaviorName(el){var t=norm((el.getAttribute&&el.getAttribute('data-behavior'))||el.textContent||'');for(var i=0;i<allowed.length;i++){if(t===allowed[i]||t.indexOf(allowed[i])===0||t.indexOf(allowed[i]+' ')===0)return allowed[i]}if(t.indexOf('pica')===0)return 'pica';return ''}
+function sectionOf(el){var p=el;for(var i=0;p&&i<8;i++,p=p.parentElement){var tx=norm(p.textContent||'');if(tx.indexOf('behavior documentation')>=0){var hits=0;[].slice.call(p.querySelectorAll('.behavior,.behavior-item,[data-behavior],.behavior-card')).forEach(function(x){if(behaviorName(x))hits++});if(hits>=2)return p}}return el.closest&&el.closest('.behaviorbar,.behavior-bar,.behaviors,.behavior-section')}
 function clean(){
- var controls=[].slice.call(document.querySelectorAll('button,.behavior,.behavior-item,[data-behavior],.behavior-card'));
- controls.forEach(function(el){var name=behaviorName(el),looks=el.hasAttribute('data-behavior')||el.classList.contains('behavior')||el.classList.contains('behavior-item')||el.classList.contains('behavior-card')||el.closest('.behaviorbar,.behavior-bar,.behaviors,.behavior-section');if(!looks)return;if(!name)el.remove()});
- var sections=[].slice.call(document.querySelectorAll('.behaviorbar,.behavior-bar,.behaviors,.behavior-section'));
- var top=sections.filter(function(s){return !sections.some(function(o){return o!==s&&o.contains(s)})});
- var seenSections={};
- top.forEach(function(section){
-   var seenButtons={};
-   [].slice.call(section.querySelectorAll('button,.behavior,.behavior-item,[data-behavior],.behavior-card')).forEach(function(el){var name=behaviorName(el);if(!name)return;if(seenButtons[name])el.remove();else seenButtons[name]=1});
-   var names=Object.keys(seenButtons).sort();if(names.length<2)return;var key=names.join('|');if(seenSections[key])section.style.display='none';else seenSections[key]=1;
- });
+ var controls=[].slice.call(document.querySelectorAll('.behavior,.behavior-item,[data-behavior],.behavior-card'));
+ var groups=[];
+ controls.forEach(function(el){var name=behaviorName(el);if(!name)return;var section=sectionOf(el);if(!section)return;var g=groups.find(function(x){return x.section===section});if(!g){g={section:section,names:{},els:[]};groups.push(g)}g.names[name]=1;g.els.push(el)});
+ var preferred=groups.find(function(g){return allowed.every(function(a){return !!g.names[a]})});
+ if(preferred){groups.forEach(function(g){if(g.section!==preferred.section)g.section.style.display='none'});preferred.section.style.display='';var seen={};preferred.els.forEach(function(el){var n=behaviorName(el);if(allowed.indexOf(n)<0){el.remove();return}if(seen[n])el.remove();else seen[n]=1})}
+ else{controls.forEach(function(el){var n=behaviorName(el);if(n&&allowed.indexOf(n)<0)el.remove()})}
 }
 clean();new MutationObserver(clean).observe(document.documentElement,{childList:true,subtree:true});
+})();<\/script>`}
+function letterTracingAddon(){return `<style id="chris-letter-tracing-style">
+body{padding-bottom:112px!important}
+#chrisLetterControls{position:fixed;left:0;right:0;bottom:0;z-index:2147483646;background:#fff;border-top:2px solid #dbe6f2;padding:8px 10px calc(8px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:8px;box-shadow:0 -5px 18px rgba(15,23,42,.14)}
+#chrisLetterControls button{min-height:58px;border-radius:10px;border:1px solid #bfd0e2;background:#fff;color:#17365d;font-size:19px;font-weight:900;touch-action:manipulation}
+#chrisLetterControls button[data-score="correct"].selected{background:#eaf8ef;border-color:#2f855a;color:#237a45}
+#chrisLetterControls button[data-score="incorrect"].selected{background:#fff1f1;border-color:#c53030;color:#b42318}
+#chrisNextTrial{background:#1677ff!important;color:#fff!important;border-color:#1677ff!important}
+#chrisTrialStatus{grid-column:1/-1;text-align:center;color:#64748b;font-size:13px;font-weight:900;line-height:1}
+</style><script id="chris-letter-tracing-controls">(function(){
+if(window.__chrisLetterTracingInstalled)return;window.__chrisLetterTracingInstalled=true;
+var trial=1;
+function textOf(el){return ((el&&((el.textContent||el.value||el.getAttribute&&el.getAttribute('aria-label'))))||'').trim().toLowerCase().replace(/\\s+/g,' ')}
+function buttons(){return [].slice.call(document.querySelectorAll('button,[role="button"],input[type="button"],input[type="submit"]'))}
+function ours(el){return !!(el&&el.closest&&el.closest('#chrisLetterControls'))}
+function findButton(words){return buttons().find(function(el){if(ours(el))return false;var t=textOf(el);return words.some(function(w){return t===w||t.indexOf(w)>=0})})||null}
+function targetSelect(){return [].slice.call(document.querySelectorAll('select')).find(function(s){var meta=((s.name||'')+' '+(s.id||'')+' '+(s.getAttribute('aria-label')||'')+' '+((s.parentElement&&s.parentElement.textContent)||'')).toLowerCase();var vals=[].slice.call(s.options||[]).map(function(o){return (o.value||o.textContent||'').trim()}).filter(Boolean);var letters=vals.filter(function(v){return /^[a-z]$/i.test(v)}).length;return /letter|target|character|alphabet/.test(meta)||letters>=Math.min(8,Math.max(3,Math.floor(vals.length*.5)))})||null}
+function captureTarget(){var s=targetSelect();return s?{el:s,value:s.value,index:s.selectedIndex}:null}
+function restoreTarget(t){if(!t||!t.el)return;try{if(t.el.value!==t.value){t.el.value=t.value;if(t.el.value!==t.value)t.el.selectedIndex=t.index;t.el.dispatchEvent(new Event('input',{bubbles:true}));t.el.dispatchEvent(new Event('change',{bubbles:true}))}}catch(e){}}
+function erase(){var b=findButton(['erase','clear tracing','clear drawing','clear canvas','reset drawing','clear']);if(b)try{b.click()}catch(e){}document.querySelectorAll('canvas').forEach(function(c){try{var x=c.getContext('2d');if(x)x.clearRect(0,0,c.width,c.height)}catch(e){}})}
+function hideOriginalScoring(){var row=document.querySelector('.response-row');if(row)row.style.display='none';buttons().forEach(function(b){if(ours(b))return;var t=textOf(b);if(t==='independent'||t==='prompted'||t==='incorrect'){var r=b.closest&&b.closest('.response-row');if(r)r.style.display='none';else b.style.display='none'}})}
+var bar=document.createElement('div');bar.id='chrisLetterControls';bar.innerHTML='<button type="button" data-score="correct">Correct</button><button type="button" data-score="incorrect">Incorrect</button><button type="button" id="chrisNextTrial">Next Trial</button><div id="chrisTrialStatus">Trial 1 · Same letter</div>';document.body.appendChild(bar);
+function status(){var s=document.getElementById('chrisTrialStatus');if(s)s.textContent='Trial '+trial+' · Same letter'}
+function score(kind){var target=captureTarget(),under=kind==='correct'?findButton(['independent','correct','right']):findButton(['incorrect','wrong']);if(under)try{under.click()}catch(e){}setTimeout(function(){restoreTarget(target)},0);bar.querySelectorAll('[data-score]').forEach(function(b){b.classList.toggle('selected',b.getAttribute('data-score')===kind)})}
+bar.querySelector('[data-score="correct"]').addEventListener('click',function(){score('correct')});
+bar.querySelector('[data-score="incorrect"]').addEventListener('click',function(){score('incorrect')});
+document.getElementById('chrisNextTrial').addEventListener('click',function(){var target=captureTarget(),under=findButton(['next trial','next']);if(under)try{under.click()}catch(e){}trial++;setTimeout(function(){restoreTarget(target);erase();status();hideOriginalScoring()},20);bar.querySelectorAll('[data-score]').forEach(function(b){b.classList.remove('selected')})});
+hideOriginalScoring();new MutationObserver(hideOriginalScoring).observe(document.documentElement,{childList:true,subtree:true});status();
 })();<\/script>`}
 function inject(text,addon){return /<\/body>/i.test(text)?text.replace(/<\/body>/i,addon+'</body>'):text+addon}
 function normalizeHtml(value){
@@ -82,13 +107,16 @@ const task=(async()=>{const u=new URL(url,location.href);if(u.hostname.endsWith(
 remoteCache.set(key,task);try{return await task}catch(err){remoteCache.delete(key);throw err}
 }
 async function programHtml(program){
-if(program.mode==='embedded'&&program.b64)return normalizeHtml(decode64(program.b64));
-if(program.url)return getRemoteHtml(program.url);
-throw new Error('Program source is not available in this hub build.');
+let html;
+if(program.mode==='embedded'&&program.b64)html=normalizeHtml(decode64(program.b64));
+else if(program.url)html=await getRemoteHtml(program.url);
+else throw new Error('Program source is not available in this hub build.');
+if(/\bletter\s+tracing\b/i.test(String(program.name||''))&&!/id=["']chris-letter-tracing-controls["']/i.test(html))html=inject(html,letterTracingAddon());
+return html;
 }
 function buildButtons(){items.innerHTML='';data.forEach((p,i)=>{const b=document.createElement('button');b.className='program';b.type='button';const n=document.createElement('span');n.textContent=String(i+1).padStart(2,'0');const label=document.createElement('b');label.textContent=p.name||('Program '+(i+1));b.append(n,label);b.addEventListener('click',()=>load(i));items.appendChild(b)});buttons=[...items.querySelectorAll('.program')];count.textContent=data.length+' programs';prev.disabled=false;next.disabled=false}
 async function load(i){if(!data.length)return;i=Math.max(0,Math.min(i,data.length-1));active=i;const token=++loadToken,p=data[i];buttons.forEach((b,j)=>b.classList.toggle('active',j===i));current.textContent=p.name||('Program '+(i+1));setStatus('Loading · '+(i+1)+' of '+data.length,false);frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:32px;color:#64748b"><b>Loading program…</b></body></html>';try{const h=await programHtml(p);if(token!==loadToken)return;frame.srcdoc=h;setStatus('Ready · '+(i+1)+' of '+data.length,false)}catch(err){if(token!==loadToken)return;const msg=err&&err.message?err.message:String(err);frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:32px"><h2>Program unavailable</h2><p style="color:#b42318;font-weight:700">'+msg.replace(/[<&]/g,'')+'</p></body></html>';setStatus(msg,true)}try{localStorage.setItem('chris_f_hub:last',String(i))}catch(e){}if(buttons[i])buttons[i].scrollIntoView({block:'nearest'})}
-async function start(){try{const response=await fetch(SOURCE+'?v=20261005-original-subtraction',{cache:'no-store'});if(!response.ok)throw new Error('Could not read '+SOURCE+' ('+response.status+')');const source=await response.text(),match=source.match(/<script\s+id=["']programData["'][^>]*>([\s\S]*?)<\/script>/i);if(!match)throw new Error('Program data was not found.');let payload=match[1].trim();if(/&quot;|&#34;|&amp;/.test(payload.slice(0,1000)))payload=decodeEntities(payload);data=JSON.parse(payload);if(!Array.isArray(data)||!data.length)throw new Error('Program list is empty.');buildButtons();let saved=0;try{saved=Number(localStorage.getItem('chris_f_hub:last')||0)}catch(e){}if(!Number.isFinite(saved)||saved<0||saved>=data.length)saved=0;load(saved)}catch(err){const msg=err&&err.message?err.message:String(err);current.textContent='Chris F. Program Hub';items.innerHTML='<div class="loading" style="color:#b42318">Program hub could not be loaded.</div>';setStatus(msg,true)}}
+async function start(){try{const response=await fetch(SOURCE+'?v=20261006-letter-behavior-fix',{cache:'no-store'});if(!response.ok)throw new Error('Could not read '+SOURCE+' ('+response.status+')');const source=await response.text(),match=source.match(/<script\s+id=["']programData["'][^>]*>([\s\S]*?)<\/script>/i);if(!match)throw new Error('Program data was not found.');let payload=match[1].trim();if(/&quot;|&#34;|&amp;/.test(payload.slice(0,1000)))payload=decodeEntities(payload);data=JSON.parse(payload);if(!Array.isArray(data)||!data.length)throw new Error('Program list is empty.');buildButtons();let saved=0;try{saved=Number(localStorage.getItem('chris_f_hub:last')||0)}catch(e){}if(!Number.isFinite(saved)||saved<0||saved>=data.length)saved=0;load(saved)}catch(err){const msg=err&&err.message?err.message:String(err);current.textContent='Chris F. Program Hub';items.innerHTML='<div class="loading" style="color:#b42318">Program hub could not be loaded.</div>';setStatus(msg,true)}}
 function syncStudentContext(){try{const doc=frame.contentDocument;if(!doc)return;const name=doc.getElementById('studentName');if(name)name.textContent='Chris F.';const provider=doc.getElementById('providerName');if(provider)provider.textContent=(adultSupport.value||'Adult Support').trim()||'Adult Support'}catch(e){}}
 try{adultSupport.value=localStorage.getItem('chris_f_hub:adult_support')||''}catch(e){}
 adultSupport.addEventListener('input',()=>{try{localStorage.setItem('chris_f_hub:adult_support',adultSupport.value.trim())}catch(e){}syncStudentContext()});frame.addEventListener('load',syncStudentContext);
