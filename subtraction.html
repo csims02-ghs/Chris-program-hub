@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>Subtraction — Chris F.</title>
+<style>
+:root{--navy:#17365d;--blue:#1677ff;--line:#dbe6f2;--muted:#64748b;--bg:#eef4fa;--green:#237a45;--greenbg:#eaf8ef;--red:#b42318;--redbg:#fff1f1;--amber:#9a6700;--amberbg:#fff7db}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:var(--navy);background:var(--bg);-webkit-text-size-adjust:100%;overscroll-behavior:none}
+body{padding:12px 12px calc(20px + env(safe-area-inset-bottom));touch-action:manipulation}
+button,select{font:inherit;touch-action:manipulation}
+.shell{max-width:1100px;margin:0 auto;display:grid;gap:12px}
+.topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:0 4px 16px rgba(23,54,93,.06)}
+.title{font-size:26px;font-weight:1000;letter-spacing:-.02em}.subtitle{font-size:13px;color:var(--muted);font-weight:800}
+.topmeta{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap}.badge{padding:6px 9px;border-radius:999px;background:#eaf3ff;color:#145ea8;font-size:12px;font-weight:900}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 4px 16px rgba(23,54,93,.05)}
+.setup{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:end}.field label{display:block;font-size:12px;font-weight:900;color:#49657f;margin-bottom:6px}.field select{width:100%;min-height:52px;border:1px solid #bfd0e2;border-radius:11px;background:#fff;color:var(--navy);padding:8px 11px;font-size:17px;font-weight:800}
+.session{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:12px}
+.stimulus{min-height:330px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative}
+.instruction{font-size:18px;color:var(--muted);font-weight:800;margin-bottom:10px}
+.problem{font-size:clamp(86px,15vw,168px);line-height:.95;font-weight:1000;letter-spacing:.01em;color:#0f2e50;font-variant-numeric:tabular-nums;white-space:nowrap}
+.trial{position:absolute;top:14px;right:14px;padding:7px 10px;border-radius:999px;background:#f2f6fb;border:1px solid var(--line);font-size:13px;font-weight:1000;color:#49657f}
+.score{display:grid;align-content:start;gap:9px}.score h3,.behavior-title{margin:0 0 2px;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:#49657f}
+.scorebtn{min-height:62px;border-radius:12px;border:2px solid #bfd0e2;background:#fff;color:var(--navy);font-size:19px;font-weight:1000;cursor:pointer}
+.scorebtn.correct{border-color:#85c89d;background:var(--greenbg);color:var(--green)}.scorebtn.incorrect{border-color:#efaaaa;background:var(--redbg);color:var(--red)}.scorebtn.prompted{border-color:#e5c46b;background:var(--amberbg);color:var(--amber)}
+.scorebtn:disabled{opacity:.45;cursor:not-allowed}.score-status{min-height:42px;border:1px solid var(--line);border-radius:10px;background:#f8fbff;padding:10px;text-align:center;font-size:13px;font-weight:900;color:var(--muted)}
+.behavior-wrap{display:grid;gap:9px}.behaviors{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.behavior{min-height:62px;border:1px solid #bfd0e2;border-radius:12px;background:#fff;color:var(--navy);padding:8px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left}
+.behavior .count{min-width:32px;height:32px;border-radius:999px;display:grid;place-items:center;background:#eef4fa;color:#145ea8;font-size:15px}
+.controls{position:sticky;bottom:0;z-index:5;display:grid;grid-template-columns:1fr 1fr;gap:10px;background:rgba(238,244,250,.96);padding:10px 0 calc(6px + env(safe-area-inset-bottom));backdrop-filter:blur(8px)}
+.control{min-height:62px;border-radius:13px;border:2px solid var(--blue);background:var(--blue);color:#fff;font-size:20px;font-weight:1000;cursor:pointer}.control.secondary{background:#fff;color:#145ea8;border-color:#bfd0e2}.control:disabled{opacity:.42;cursor:not-allowed}
+.summary{display:none}.summary.show{display:block}.summary-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}.metric{background:#f8fbff;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}.metric b{display:block;font-size:24px}.metric span{font-size:12px;color:var(--muted);font-weight:800}
+.session-note{margin-top:10px;color:var(--muted);font-size:12px;font-weight:700}
+@media(max-width:780px){.setup{grid-template-columns:1fr 1fr}.session{grid-template-columns:1fr}.stimulus{min-height:280px}.behaviors{grid-template-columns:1fr 1fr}.summary-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:520px){body{padding:8px}.setup{grid-template-columns:1fr}.problem{font-size:clamp(72px,23vw,126px)}.topmeta{margin-left:0}.controls{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div><div class="title">Subtraction</div><div class="subtitle"><span id="studentName">Chris F.</span> · Staff-scored skill acquisition program</div></div>
+    <div class="topmeta"><span class="badge" id="providerName">Adult Support</span><span class="badge">iPad 7 Ready</span><span class="badge">Staff Scored</span></div>
+  </header>
+
+  <section class="card setup" aria-label="Program setup">
+    <div class="field"><label for="range">Number range</label><select id="range"><option value="10">0–10</option><option value="20" selected>0–20</option><option value="50">0–50</option><option value="100">0–100</option></select></div>
+    <div class="field"><label for="trials">Trials</label><select id="trials"><option>5</option><option selected>10</option><option>15</option><option>20</option><option>25</option><option>30</option><option>40</option></select></div>
+    <div class="field"><label for="order">Problem type</label><select id="order"><option value="nonnegative" selected>No negative answers</option><option value="mixed">Allow negative answers</option></select></div>
+  </section>
+
+  <section class="session">
+    <div class="card stimulus">
+      <div class="trial" id="trialBadge">Trial 1 of 10</div>
+      <div class="instruction">Solve the subtraction problem.</div>
+      <div class="problem" id="problem" aria-live="polite">12 − 5</div>
+    </div>
+    <div class="card score">
+      <h3>Staff Scoring</h3>
+      <button class="scorebtn correct" type="button" data-score="correct">Correct</button>
+      <button class="scorebtn incorrect" type="button" data-score="incorrect">Incorrect</button>
+      <button class="scorebtn prompted" type="button" data-score="prompted">Prompted</button>
+      <div class="score-status" id="scoreStatus">Score the response to continue.</div>
+    </div>
+  </section>
+
+  <section class="card behavior-wrap">
+    <div class="behavior-title">Behavior Data · tap once per occurrence</div>
+    <div class="behaviors" id="behaviors">
+      <button class="behavior" type="button" data-behavior="Non-Compliance"><span>Non-Compliance</span><span class="count">0</span></button>
+      <button class="behavior" type="button" data-behavior="Tantrum"><span>Tantrum</span><span class="count">0</span></button>
+      <button class="behavior" type="button" data-behavior="Work Avoidance"><span>Work Avoidance</span><span class="count">0</span></button>
+      <button class="behavior" type="button" data-behavior="Out of Area"><span>Out of Area</span><span class="count">0</span></button>
+    </div>
+  </section>
+
+  <section class="card summary" id="summary">
+    <strong>Session Summary</strong>
+    <div class="summary-grid">
+      <div class="metric"><b id="mCorrect">0</b><span>Correct</span></div>
+      <div class="metric"><b id="mIncorrect">0</b><span>Incorrect</span></div>
+      <div class="metric"><b id="mPrompted">0</b><span>Prompted</span></div>
+      <div class="metric"><b id="mAccuracy">0%</b><span>Independent Accuracy</span></div>
+      <div class="metric"><b id="mTrials">0</b><span>Trials Scored</span></div>
+    </div>
+    <div class="session-note" id="sessionNote"></div>
+  </section>
+
+  <div class="controls">
+    <button class="control secondary" id="finish" type="button">Finish Session</button>
+    <button class="control" id="nextTrial" type="button" disabled>Next Trial</button>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+var state={trial:1,total:10,score:null,results:[],problem:null,behaviors:{'Non-Compliance':0,'Tantrum':0,'Work Avoidance':0,'Out of Area':0},finished:false};
+var problemEl=document.getElementById('problem'),badge=document.getElementById('trialBadge'),nextBtn=document.getElementById('nextTrial'),finishBtn=document.getElementById('finish'),scoreStatus=document.getElementById('scoreStatus'),summary=document.getElementById('summary');
+var rangeEl=document.getElementById('range'),trialsEl=document.getElementById('trials'),orderEl=document.getElementById('order');
+function int(n){return parseInt(n,10)||0}
+function random(n){return Math.floor(Math.random()*(n+1))}
+function makeProblem(){
+  var max=int(rangeEl.value)||20,a=random(max),b=random(max),mixed=orderEl.value==='mixed';
+  if(!mixed&&b>a){var tmp=a;a=b;b=tmp}
+  var tries=0;
+  while(state.problem&&state.problem.a===a&&state.problem.b===b&&tries<12){a=random(max);b=random(max);if(!mixed&&b>a){var t=a;a=b;b=t}tries++}
+  state.problem={a:a,b:b,answer:a-b};
+}
+function renderProblem(){
+  if(!state.problem)makeProblem();
+  problemEl.textContent=state.problem.a+' − '+state.problem.b;
+  badge.textContent='Trial '+state.trial+' of '+state.total;
+}
+function resetScore(){
+  state.score=null;
+  document.querySelectorAll('.scorebtn').forEach(function(b){b.disabled=false;b.setAttribute('aria-pressed','false')});
+  nextBtn.disabled=true;nextBtn.textContent=state.trial>=state.total?'Finish Session':'Next Trial';
+  scoreStatus.textContent='Score the response to continue.';
+}
+function score(kind){
+  if(state.finished||state.score)return;
+  state.score=kind;
+  rangeEl.disabled=true;trialsEl.disabled=true;orderEl.disabled=true;
+  state.results.push({trial:state.trial,a:state.problem.a,b:state.problem.b,answer:state.problem.answer,score:kind,time:new Date().toISOString()});
+  document.querySelectorAll('.scorebtn').forEach(function(b){b.disabled=true;b.setAttribute('aria-pressed',String(b.dataset.score===kind))});
+  scoreStatus.textContent=kind==='correct'?'Recorded: Correct':kind==='incorrect'?'Recorded: Incorrect':'Recorded: Prompted';
+  nextBtn.disabled=false;
+  if(state.trial>=state.total)nextBtn.textContent='Finish Session';
+  persist();
+}
+function persist(){
+  try{localStorage.setItem('chris_subtraction_active',JSON.stringify({savedAt:new Date().toISOString(),state:state,settings:{range:rangeEl.value,trials:trialsEl.value,order:orderEl.value}}))}catch(e){}
+}
+function nextTrial(){
+  if(state.finished||!state.score)return;
+  if(state.trial>=state.total){finishSession();return}
+  state.trial++;
+  makeProblem();
+  renderProblem();
+  resetScore();
+  persist();
+}
+function finishSession(){
+  if(state.finished)return;
+  state.finished=true;
+  var counts={correct:0,incorrect:0,prompted:0};
+  state.results.forEach(function(r){counts[r.score]=(counts[r.score]||0)+1});
+  var scored=state.results.length,accuracy=scored?Math.round((counts.correct/scored)*100):0;
+  document.getElementById('mCorrect').textContent=counts.correct;
+  document.getElementById('mIncorrect').textContent=counts.incorrect;
+  document.getElementById('mPrompted').textContent=counts.prompted;
+  document.getElementById('mAccuracy').textContent=accuracy+'%';
+  document.getElementById('mTrials').textContent=scored;
+  document.getElementById('sessionNote').textContent='Behavior totals — Non-Compliance: '+state.behaviors['Non-Compliance']+' · Tantrum: '+state.behaviors.Tantrum+' · Work Avoidance: '+state.behaviors['Work Avoidance']+' · Out of Area: '+state.behaviors['Out of Area'];
+  summary.classList.add('show');
+  nextBtn.disabled=true;finishBtn.disabled=true;
+  document.querySelectorAll('.scorebtn,.behavior').forEach(function(b){b.disabled=true});
+  try{
+    var history=JSON.parse(localStorage.getItem('chris_subtraction_sessions')||'[]');
+    if(!Array.isArray(history))history=[];
+    history.unshift({completedAt:new Date().toISOString(),settings:{range:rangeEl.value,trials:state.total,order:orderEl.value},results:state.results,behaviors:state.behaviors,accuracy:accuracy});
+    localStorage.setItem('chris_subtraction_sessions',JSON.stringify(history.slice(0,30)));
+    localStorage.removeItem('chris_subtraction_active');
+  }catch(e){}
+  summary.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function applySettings(){
+  if(state.results.length)return;
+  state.total=int(trialsEl.value)||10;
+  state.trial=1;state.finished=false;
+  makeProblem();renderProblem();resetScore();persist();
+}
+document.querySelectorAll('.scorebtn').forEach(function(b){b.addEventListener('click',function(){score(b.dataset.score)})});
+nextBtn.addEventListener('click',nextTrial);
+finishBtn.addEventListener('click',finishSession);
+rangeEl.addEventListener('change',applySettings);trialsEl.addEventListener('change',applySettings);orderEl.addEventListener('change',applySettings);
+var lastBehaviorTap={name:'',time:0};
+document.getElementById('behaviors').addEventListener('click',function(e){
+  var b=e.target.closest('.behavior');if(!b||state.finished)return;
+  var name=b.dataset.behavior,now=Date.now();
+  if(name===lastBehaviorTap.name&&now-lastBehaviorTap.time<500)return;
+  lastBehaviorTap={name:name,time:now};
+  state.behaviors[name]=(state.behaviors[name]||0)+1;
+  b.querySelector('.count').textContent=state.behaviors[name];
+  persist();
+});
+state.total=int(trialsEl.value)||10;makeProblem();renderProblem();resetScore();persist();
+})();
+</script>
+</body>
+</html>
