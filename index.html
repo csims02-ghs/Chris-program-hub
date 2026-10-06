@@ -72,14 +72,23 @@ function setStatus(m,e){status.textContent=m;status.classList.toggle('error',!!e
 function decodeEntities(v){const b=document.createElement('textarea');b.innerHTML=String(v||'');return b.value}
 function decode64(b64){const binary=atob(b64),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return new TextDecoder('utf-8').decode(bytes)}
 const IPAD_STYLE=`<style id="chris-ipad7-final">html{-webkit-text-size-adjust:100%;text-size-adjust:100%}body{overscroll-behavior:none}button,select,input,textarea{-webkit-tap-highlight-color:transparent;touch-action:manipulation}select,input,textarea{font-size:16px}.choice,.action,.btn,.endbtn,.setup-toggle,.apply,.save,.minus,.plus{min-height:44px}.behavior{min-height:48px}@media(min-width:701px) and (max-width:1100px){.main{padding:10px}.setup-field select,.setup-field input{min-height:54px;font-size:18px}.action{min-height:54px}.choice{min-height:135px}}</style>`;
+
 function behaviorGuard(){return `<script id="chris-behavior-guard">(function(){
 var desired=['non-compliance','tantrum','work avoidance','out of area'];
 function txt(el){return String((el&&el.textContent)||'').toLowerCase().replace(/\\s+/g,' ').trim()}
 function has(t,n){return t.indexOf(n)>=0}
 function cardForHeading(h){var p=h.parentElement;for(var i=0;p&&p!==document.body&&i<7;i++,p=p.parentElement){var t=txt(p),hits=desired.filter(function(n){return has(t,n)}).length;if(hits>=3||has(t,'pica'))return p}return null}
-function dedupe(){var heads=[].slice.call(document.querySelectorAll('h1,h2,h3,h4,h5,h6,strong,b,span,div')).filter(function(e){return txt(e)==='behavior documentation'}),cards=[];heads.forEach(function(h){var c=cardForHeading(h);if(c&&cards.indexOf(c)<0)cards.push(c)});var preferred=cards.find(function(c){var t=txt(c);return desired.every(function(n){return has(t,n)})&&!has(t,'pica')})||cards.find(function(c){return has(txt(c),'work avoidance')})||cards[0];if(preferred)cards.forEach(function(c){c.style.display=c===preferred?'':'none'});var scope=preferred||document;[].slice.call(scope.querySelectorAll('[data-behavior],.behavior,.behavior-item,.behavior-card')).forEach(function(el){var t=txt(el);if(has(t,'pica'))el.remove()})}
+function dedupe(){
+ var heads=[].slice.call(document.querySelectorAll('h1,h2,h3,h4,h5,h6,strong,b,span,div')).filter(function(e){return txt(e)==='behavior documentation'}),cards=[];
+ heads.forEach(function(h){var c=cardForHeading(h);if(c&&cards.indexOf(c)<0)cards.push(c)});
+ var preferred=cards.find(function(c){var t=txt(c);return desired.every(function(n){return has(t,n)})&&!has(t,'pica')})||cards.find(function(c){return has(txt(c),'work avoidance')})||cards[0];
+ if(preferred)cards.forEach(function(c){c.style.display=c===preferred?'':'none'});
+ var scope=preferred||document;
+ [].slice.call(scope.querySelectorAll('[data-behavior],.behavior,.behavior-item,.behavior-card')).forEach(function(el){var t=txt(el);if(has(t,'pica'))el.remove()});
+}
 dedupe();new MutationObserver(dedupe).observe(document.documentElement,{childList:true,subtree:true});
 })();<\/script>`}
+
 function letterTracingAddon(){return `<style id="chris-letter-tracing-style">
 :root{--lt-blue:#1677ff;--lt-navy:#17365d;--lt-line:#dbe6f2;--lt-muted:#64748b;--lt-bg:#eef4fa;--lt-green:#237a45;--lt-red:#b42318}
 body.chris-letter-calm{background:var(--lt-bg)!important;color:var(--lt-navy)!important;padding:12px 12px 22px!important;overflow:auto!important}
@@ -119,28 +128,82 @@ function targetSelect(){return [].slice.call(document.querySelectorAll('select')
 function captureTarget(){var s=targetSelect();return s?{el:s,value:s.value,index:s.selectedIndex}:null}
 function redrawSameTarget(t){if(!t||!t.el)return;var s=t.el;internalRefresh=true;try{s.selectedIndex=t.index;s.value=t.value;s.dispatchEvent(new Event('input',{bubbles:true}));s.dispatchEvent(new Event('change',{bubbles:true}))}catch(e){}setTimeout(function(){internalRefresh=false},0)}
 function currentTarget(){var s=targetSelect();if(!s)return 'Current letter';var o=s.options&&s.options[s.selectedIndex];return ((o&&(o.textContent||o.value))||s.value||'Current letter').trim()}
-function hideOriginalScoring(){var row=document.querySelector('.response-row');if(row)row.style.display='none';buttons().forEach(function(b){if(ours(b))return;var t=textOf(b);if(t==='independent'||t==='prompted'||t==='incorrect'){var r=b.closest&&b.closest('.response-row');if(r)r.style.display='none';else b.style.display='none'}})}
+function scoreLabel(el){return textOf(el).replace(/[✓✔✕✖×x]/g,'').replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim()}
+function hideOriginalScoring(){
+  var scoreWords=['independent','prompted','incorrect'];
+  var hiddenRows=[];
+  buttons().forEach(function(b){
+    if(ours(b))return;
+    var t=scoreLabel(b);if(scoreWords.indexOf(t)<0)return;
+    var r=b.closest&&b.closest('.response-row,.responses,.response-buttons,.scoring-row,.score-row');
+    if(!r&&b.parentElement){var bs=[].slice.call(b.parentElement.querySelectorAll('button,[role="button"],input[type="button"],input[type="submit"]'));if(bs.length>=2&&bs.length<=4&&bs.every(function(x){return scoreWords.indexOf(scoreLabel(x))>=0}))r=b.parentElement}
+    if(r){r.style.display='none';if(hiddenRows.indexOf(r)<0)hiddenRows.push(r)}else b.style.display='none';
+  });
+  var row=document.querySelector('.response-row');if(row)row.style.display='none';
+}
 function locateBehaviorSection(){var heads=[].slice.call(document.querySelectorAll('h1,h2,h3,h4,h5,h6,strong,b,span,div')).filter(function(e){return textOf(e)==='behavior documentation'});for(var i=0;i<heads.length;i++){var p=heads[i].parentElement;for(var n=0;p&&p!==document.body&&n<7;n++,p=p.parentElement){var t=textOf(p);if(t.indexOf('work avoidance')>=0&&t.indexOf('non-compliance')>=0&&t.indexOf('tantrum')>=0&&t.indexOf('out of area')>=0)return p}}return document.querySelector('.behavior-section,.behaviorbar,.behavior-bar')}
 function dedupeBehaviorSections(){var desired=['non-compliance','tantrum','work avoidance','out of area'];var heads=[].slice.call(document.querySelectorAll('h1,h2,h3,h4,h5,h6,strong,b,span,div')).filter(function(e){return textOf(e)==='behavior documentation'}),cards=[];heads.forEach(function(h){var p=h.parentElement;for(var n=0;p&&p!==document.body&&n<7;n++,p=p.parentElement){var t=textOf(p),hits=desired.filter(function(x){return t.indexOf(x)>=0}).length;if(hits>=3||t.indexOf('pica')>=0){if(cards.indexOf(p)<0)cards.push(p);break}}});var preferred=cards.find(function(c){var t=textOf(c);return desired.every(function(x){return t.indexOf(x)>=0})&&t.indexOf('pica')<0})||cards.find(function(c){return textOf(c).indexOf('work avoidance')>=0})||cards[0];if(preferred)cards.forEach(function(c){c.style.display=c===preferred?'':'none'})}
 function styleWorkArea(){var art=document.querySelector('canvas')||document.querySelector('svg');if(!art)return;var p=art.parentElement;while(p&&p!==document.body){var r=p.querySelectorAll?p.querySelectorAll('canvas,svg').length:0;if(r&&p.children.length<=6)break;p=p.parentElement}if(p&&p!==document.body)p.classList.add('chris-letter-work-card')}
 var bar=document.createElement('section');bar.id='chrisLetterControls';bar.setAttribute('aria-label','Letter tracing trial controls');bar.innerHTML='<div id="chrisLetterHeader"><div id="chrisLetterHeaderText"><strong>Trial Scoring</strong><span>Complete the current benchmark target, score the response, then repeat the same letter.</span></div><div id="chrisTrialStatus">Trial 1 · Same letter</div></div><div id="chrisLetterActions"><button type="button" data-score="correct">Correct</button><button type="button" data-score="incorrect">Incorrect</button><button type="button" id="chrisNextTrial">Next Trial</button></div>';
 var behavior=locateBehaviorSection();if(behavior&&behavior.parentElement)behavior.parentElement.insertBefore(bar,behavior);else document.body.appendChild(bar);
-function status(){var s=document.getElementById('chrisTrialStatus');if(s)s.textContent=currentTarget()+' · Trial '+trial+' · Same letter'}
+function trialLimitField(){return [].slice.call(document.querySelectorAll('select,input')).find(function(el){if(el.closest&&el.closest('#chrisLetterControls'))return false;var meta=((el.id||'')+' '+(el.name||'')+' '+(el.getAttribute&&el.getAttribute('aria-label')||'')+' '+((el.parentElement&&el.parentElement.textContent)||'')).toLowerCase();return /\btrials?\b|trial count|number of trials/.test(meta)})||null}
+function trialLimit(){var f=trialLimitField(),n=f?parseInt(f.value,10):NaN;if(!Number.isFinite(n)||n<1){var m=(document.body.innerText||'').match(/(?:trials?|trial count|number of trials)\s*[:\-]?\s*(\d{1,2})/i);n=m?parseInt(m[1],10):NaN}return Number.isFinite(n)&&n>0?n:null}
+function syncTrialButton(){var b=document.getElementById('chrisNextTrial'),limit=trialLimit();if(!b)return;if(limit&&trial>=limit){b.disabled=true;b.textContent='Trials Complete'}else{b.disabled=false;b.textContent='Next Trial'}}
+function status(){var s=document.getElementById('chrisTrialStatus'),limit=trialLimit();if(s)s.textContent=currentTarget()+' · Trial '+trial+(limit?' of '+limit:'')+' · Same letter';syncTrialButton()}
 function score(kind){var target=captureTarget(),under=kind==='correct'?findButton(['independent','correct','right']):findButton(['incorrect','wrong']);if(under)try{under.click()}catch(e){}setTimeout(function(){if(target&&target.el&&(target.el.value!==target.value||target.el.selectedIndex!==target.index))redrawSameTarget(target);status()},0);bar.querySelectorAll('[data-score]').forEach(function(b){b.classList.toggle('selected',b.getAttribute('data-score')===kind)})}
 bar.querySelector('[data-score="correct"]').addEventListener('click',function(){score('correct')});
 bar.querySelector('[data-score="incorrect"]').addEventListener('click',function(){score('incorrect')});
-document.getElementById('chrisNextTrial').addEventListener('click',function(){var target=captureTarget(),under=findButton(['next trial','next']);internalRefresh=true;if(under)try{under.click()}catch(e){}trial++;setTimeout(function(){redrawSameTarget(target);status();hideOriginalScoring();styleWorkArea();dedupeBehaviorSections()},45);bar.querySelectorAll('[data-score]').forEach(function(b){b.classList.remove('selected')})});
+document.getElementById('chrisNextTrial').addEventListener('click',function(){var limit=trialLimit();if(limit&&trial>=limit){syncTrialButton();return}var target=captureTarget(),under=findButton(['next trial','next']);internalRefresh=true;if(under)try{under.click()}catch(e){}trial++;setTimeout(function(){redrawSameTarget(target);status();hideOriginalScoring();styleWorkArea();dedupeBehaviorSections()},45);bar.querySelectorAll('[data-score]').forEach(function(b){b.classList.remove('selected')})});
 var ts=targetSelect();if(ts)ts.addEventListener('change',function(){if(internalRefresh)return;trial=1;status()});
+var tlf=trialLimitField();if(tlf)tlf.addEventListener('change',function(){var limit=trialLimit();if(limit&&trial>limit)trial=limit;status()});
 function housekeeping(){hideOriginalScoring();styleWorkArea();dedupeBehaviorSections()}
 housekeeping();new MutationObserver(housekeeping).observe(document.documentElement,{childList:true,subtree:true});status();
 })();<\/script>`}
+
+function functionalWritingAddon(){return `<style id="chris-functional-writing-clean">
+.choice,.choices,.choice-row,.choice-grid,.answer-choices,.response-choices{display:none!important}
+</style><script id="chris-functional-writing-clean-script">(function(){
+function clean(){
+ var groups=[].slice.call(document.querySelectorAll('.choices,.choice-row,.choice-grid,.answer-choices,.response-choices'));
+ groups.forEach(function(g){g.style.display='none'});
+ [].slice.call(document.querySelectorAll('.choice')).forEach(function(c){c.style.display='none'});
+ var buttons=[].slice.call(document.querySelectorAll('button,[role="button"]'));
+ var scoreNames=['independent','prompted','incorrect'];
+ function label(b){return String(b.textContent||'').toLowerCase().replace(/[✓✔✕✖×x]/g,'').replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim()}
+ var scoreBtns=buttons.filter(function(b){return scoreNames.indexOf(label(b))>=0});
+ if(scoreBtns.length===3){var p=scoreBtns[0].parentElement;if(p&&scoreBtns.every(function(b){return b.parentElement===p}))p.style.display='none';else scoreBtns.forEach(function(b){b.style.display='none'})}
+}
+clean();new MutationObserver(clean).observe(document.documentElement,{childList:true,subtree:true});
+})();<\/script>`}
+
 function inject(text,addon){return /<\/body>/i.test(text)?text.replace(/<\/body>/i,addon+'</body>'):text+addon}
-function normalizeHtml(value){let text=String(value||'').trim().replace(/^\s*```(?:html)?\s*/i,'').replace(/\s*```\s*$/,'').trim();if(!/<(?:!doctype|html|head|body|div|section|main|style|script)\b/i.test(text)&&/&lt;\/?(?:!doctype|html|head|body|div|section|main|style|script)/i.test(text))text=decodeEntities(text).trim();if(!/<(?:!doctype|html|head|body)\b/i.test(text))text='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"></head><body>'+text+'</body></html>';if(/<meta\s+name=["']viewport["'][^>]*>/i.test(text))text=text.replace(/<meta\s+name=["']viewport["'][^>]*>/i,'<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">');else if(/<head[^>]*>/i.test(text))text=text.replace(/<head([^>]*)>/i,'<head$1><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">');if(!/id=["']chris-ipad7-final["']/i.test(text))text=/<\/head>/i.test(text)?text.replace(/<\/head>/i,IPAD_STYLE+'</head>'):IPAD_STYLE+text;if(!/id=["']chris-behavior-guard["']/i.test(text))text=inject(text,behaviorGuard());return text}
-async function getRemoteHtml(url){const key=url;if(remoteCache.has(key))return remoteCache.get(key);const task=(async()=>{const u=new URL(url,location.href);if(u.hostname.endsWith('.supabase.co')&&u.pathname.includes('/functions/v1/compass-program-runner'))u.searchParams.set('format','json');const response=await fetch(u.toString(),{method:'GET',mode:'cors',cache:'no-store',headers:{Accept:'application/json, text/plain;q=0.9, */*;q=0.8'}});if(!response.ok)throw new Error('Program request failed ('+response.status+')');const raw=await response.text();let html=raw;try{const obj=JSON.parse(raw);if(obj&&typeof obj.html==='string')html=obj.html;else if(obj&&obj.ok===false)throw new Error(obj.error||'Program unavailable')}catch(err){if(/^\s*[{[]/.test(raw)&&!/<(?:!doctype|html|body|div|style|script)\b/i.test(raw))throw err}return normalizeHtml(html)})();remoteCache.set(key,task);try{return await task}catch(err){remoteCache.delete(key);throw err}}
-async function programHtml(program){let html;if(program.mode==='embedded'&&program.b64)html=normalizeHtml(decode64(program.b64));else if(program.url)html=await getRemoteHtml(program.url);else throw new Error('Program source is not available in this hub build.');if(/\bletter\s+tracing\b/i.test(String(program.name||''))&&!/id=["']chris-letter-tracing-controls["']/i.test(html))html=inject(html,letterTracingAddon());return html}
+function normalizeHtml(value){
+  let text=String(value||'').trim().replace(/^\s*```(?:html)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
+  if(!/<(?:!doctype|html|head|body|div|section|main|style|script)\b/i.test(text)&&/&lt;\/?(?:!doctype|html|head|body|div|section|main|style|script)/i.test(text))text=decodeEntities(text).trim();
+  if(!/<(?:!doctype|html|head|body)\b/i.test(text))text='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"></head><body>'+text+'</body></html>';
+  if(/<meta\s+name=["']viewport["'][^>]*>/i.test(text))text=text.replace(/<meta\s+name=["']viewport["'][^>]*>/i,'<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">');
+  else if(/<head[^>]*>/i.test(text))text=text.replace(/<head([^>]*)>/i,'<head$1><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">');
+  if(!/id=["']chris-ipad7-final["']/i.test(text))text=/<\/head>/i.test(text)?text.replace(/<\/head>/i,IPAD_STYLE+'</head>'):IPAD_STYLE+text;
+  if(!/id=["']chris-behavior-guard["']/i.test(text))text=inject(text,behaviorGuard());
+  return text;
+}
+async function getRemoteHtml(url){
+  const key=url;if(remoteCache.has(key))return remoteCache.get(key);
+  const task=(async()=>{const u=new URL(url,location.href);if(u.hostname.endsWith('.supabase.co')&&u.pathname.includes('/functions/v1/compass-program-runner'))u.searchParams.set('format','json');const response=await fetch(u.toString(),{method:'GET',mode:'cors',cache:'no-store',headers:{Accept:'application/json, text/plain;q=0.9, */*;q=0.8'}});if(!response.ok)throw new Error('Program request failed ('+response.status+')');const raw=await response.text();let html=raw;try{const obj=JSON.parse(raw);if(obj&&typeof obj.html==='string')html=obj.html;else if(obj&&obj.ok===false)throw new Error(obj.error||'Program unavailable')}catch(err){if(/^\s*[{[]/.test(raw)&&!/<(?:!doctype|html|body|div|style|script)\b/i.test(raw))throw err}return normalizeHtml(html)})();
+  remoteCache.set(key,task);try{return await task}catch(err){remoteCache.delete(key);throw err}
+}
+async function programHtml(program){
+  let html;
+  if(program.mode==='embedded'&&program.b64)html=normalizeHtml(decode64(program.b64));
+  else if(program.url)html=await getRemoteHtml(program.url);
+  else throw new Error('Program source is not available in this hub build.');
+  if(/\bletter\s+tracing\b/i.test(String(program.name||''))&&!/id=["']chris-letter-tracing-controls["']/i.test(html))html=inject(html,letterTracingAddon());
+  if(/\bfunctional\s+writing\b/i.test(String(program.name||''))&&!/id=["']chris-functional-writing-clean-script["']/i.test(html))html=inject(html,functionalWritingAddon());
+  return html;
+}
 function buildButtons(){items.innerHTML='';data.forEach((p,i)=>{const b=document.createElement('button');b.className='program';b.type='button';const n=document.createElement('span');n.textContent=String(i+1).padStart(2,'0');const label=document.createElement('b');label.textContent=p.name||('Program '+(i+1));b.append(n,label);b.addEventListener('click',()=>load(i));items.appendChild(b)});buttons=[...items.querySelectorAll('.program')];count.textContent=data.length+' programs';prev.disabled=false;next.disabled=false}
 async function load(i){if(!data.length)return;i=Math.max(0,Math.min(i,data.length-1));active=i;const token=++loadToken,p=data[i];buttons.forEach((b,j)=>b.classList.toggle('active',j===i));current.textContent=p.name||('Program '+(i+1));setStatus('Loading · '+(i+1)+' of '+data.length,false);frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:32px;color:#64748b"><b>Loading program…</b></body></html>';try{const h=await programHtml(p);if(token!==loadToken)return;frame.srcdoc=h;setStatus('Ready · '+(i+1)+' of '+data.length,false)}catch(err){if(token!==loadToken)return;const msg=err&&err.message?err.message:String(err);frame.srcdoc='<!doctype html><html><body style="font-family:Arial;padding:32px"><h2>Program unavailable</h2><p style="color:#b42318;font-weight:700">'+msg.replace(/[<&]/g,'')+'</p></body></html>';setStatus(msg,true)}try{localStorage.setItem('chris_f_hub:last',String(i))}catch(e){}if(buttons[i])buttons[i].scrollIntoView({block:'nearest'})}
-async function start(){try{const response=await fetch(SOURCE+'?v=20261006-letter-trial-redraw-dedupe',{cache:'no-store'});if(!response.ok)throw new Error('Could not read '+SOURCE+' ('+response.status+')');const source=await response.text(),match=source.match(/<script\s+id=["']programData["'][^>]*>([\s\S]*?)<\/script>/i);if(!match)throw new Error('Program data was not found.');let payload=match[1].trim();if(/&quot;|&#34;|&amp;/.test(payload.slice(0,1000)))payload=decodeEntities(payload);data=JSON.parse(payload);if(!Array.isArray(data)||!data.length)throw new Error('Program list is empty.');buildButtons();let saved=0;try{saved=Number(localStorage.getItem('chris_f_hub:last')||0)}catch(e){}if(!Number.isFinite(saved)||saved<0||saved>=data.length)saved=0;load(saved)}catch(err){const msg=err&&err.message?err.message:String(err);current.textContent='Chris F. Program Hub';items.innerHTML='<div class="loading" style="color:#b42318">Program hub could not be loaded.</div>';setStatus(msg,true)}}
+async function start(){try{const response=await fetch(SOURCE+'?v=20261006-letter-trial-limit-functional-writing',{cache:'no-store'});if(!response.ok)throw new Error('Could not read '+SOURCE+' ('+response.status+')');const source=await response.text(),match=source.match(/<script\s+id=["']programData["'][^>]*>([\s\S]*?)<\/script>/i);if(!match)throw new Error('Program data was not found.');let payload=match[1].trim();if(/&quot;|&#34;|&amp;/.test(payload.slice(0,1000)))payload=decodeEntities(payload);data=JSON.parse(payload);if(!Array.isArray(data)||!data.length)throw new Error('Program list is empty.');buildButtons();let saved=0;try{saved=Number(localStorage.getItem('chris_f_hub:last')||0)}catch(e){}if(!Number.isFinite(saved)||saved<0||saved>=data.length)saved=0;load(saved)}catch(err){const msg=err&&err.message?err.message:String(err);current.textContent='Chris F. Program Hub';items.innerHTML='<div class="loading" style="color:#b42318">Program hub could not be loaded.</div>';setStatus(msg,true)}}
 function syncStudentContext(){try{const doc=frame.contentDocument;if(!doc)return;const name=doc.getElementById('studentName');if(name)name.textContent='Chris F.';const provider=doc.getElementById('providerName');if(provider)provider.textContent=(adultSupport.value||'Adult Support').trim()||'Adult Support'}catch(e){}}
 try{adultSupport.value=localStorage.getItem('chris_f_hub:adult_support')||''}catch(e){}
 adultSupport.addEventListener('input',()=>{try{localStorage.setItem('chris_f_hub:adult_support',adultSupport.value.trim())}catch(e){}syncStudentContext()});frame.addEventListener('load',syncStudentContext);
